@@ -4,7 +4,7 @@
 Monitor package usage and discussion to enable content creators to gain insights into new and trending packages.
 
 ## What is the purpose, and most common use cases?
-Provide an analytics dashboard monitoring of package usage and mentions in social media to gain insights into popularity of packages.
+Provide an analytics dashboard monitoring package usage and discussion in social media to gain insights into popularity of packages.
 
 ### This could be used to:
 * Create Sweet Blogs About New and Interesting Packages: "I wrote a blog post about Pandas, now what?"
