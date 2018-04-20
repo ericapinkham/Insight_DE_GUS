@@ -4,10 +4,25 @@
 Monitor package usage and discussion to enable content creators insights into new and trending packages.
 
 ## What is the purpose, and most common use cases?
-Monitoring of package usage and mentions in social media to gain insights into popularity of packages.
-* Create Sweet Blogs
-* Understand Package Adoption and Churn
-* Write Books
+Provide an analytics dashboard monitoring of package usage and mentions in social media to gain insights into popularity of packages.
+
+### This could be used to:
+* Create Sweet Blogs About New and Interesting Packages: "I wrote a blog post about Pandas, now what?"
+* Understand Package Adoption and Churn: "We implemented a sweet feature and look at our adoption!"
+* Write Books: "Which packages should we include in our book about Haskell?"
+
+### Some possibly useful things to track:
+* Metrics:
+  * Package "Churn"
+  * Trending packages (mentions on social media)
+  * Inclusion normalized by "active" repositories
+* Dimensions:
+  * Programming Language?
+  * Domain (i.e. slicing by "dataframes" provides results for Pandas etc)?
+  * Programming language characteristics
+     * functional, imperative
+     * object oriented
+     * compiled, interpreted
 
 ## Which technologies are well-suited to solve those challenges? (list all relevant)
 * Ingestion and Processing

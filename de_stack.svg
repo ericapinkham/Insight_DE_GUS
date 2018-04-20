@@ -16,7 +16,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="de_stack.svg">
+   sodipodi:docname="de_stack.svg"
+   inkscape:export-filename="/home/eric/Insight/insight_data_engineering/de_stack.svg.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
     <marker
@@ -172,8 +175,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="528.56576"
-     inkscape:cy="482.03817"
+     inkscape:cx="519.28005"
+     inkscape:cy="424.89532"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
