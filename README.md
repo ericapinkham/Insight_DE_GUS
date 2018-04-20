@@ -5,9 +5,10 @@ Monitor package usage and discussion to enable content creators insights into ne
 
 ## What is the purpose, and most common use cases?
 Monitoring of package usage and mentions in social media to gain insights into popularity of packages.
-* Create tutorials
-* Write more detailed documentation
-* Write books
+* Create Sweet Blogs
+![Sweet Python Blog](./sweet_python_blog.png)
+* Understand Package Adoption and Churn
+* Write Books
 
 ## Which technologies are well-suited to solve those challenges? (list all relevant)
 * Ingestion and Processing
@@ -28,6 +29,4 @@ Monitoring of package usage and mentions in social media to gain insights into p
   * Play Framework
 
 ## Proposed architecture
-![alt text](./de_stack.png)
-
-[GitHub, Reddit, StackOverflow, Twitter] => Kafka => Spark Streaming => Cassandra => Spark => PostgreSQL => Play Framework
+![Data Engineering Stack](./de_stack.png)
