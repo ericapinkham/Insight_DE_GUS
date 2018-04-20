@@ -7,10 +7,11 @@ Monitor package usage and discussion to enable content creators to gain insights
 Provide an analytics dashboard monitoring package usage and discussion in social media to gain insights into popularity of packages.
 
 ### This could be used to:
-* Create Sweet Blogs About New and Interesting Packages: "I wrote a blog post about Pandas, now what?"
-* Understand Package Adoption and Churn: "We implemented a sweet feature and look at our adoption!"
-* Write Books: "Which packages should we include in our book about Haskell?"
-* Enable Developers to Understand Package Usage: "We intended our package to be used for X but almost everyone uses it for Y."
+* Create Sweet Blogs About New and Interesting Packages
+* Understand Package Adoption and Churn
+* Write Books
+* Enable Developers to Understand Package Usage
+* Give developers a sense of which packages are being used for what purposes in their language of choice
 
 ### Some possibly useful things to track:
 * Metrics:
