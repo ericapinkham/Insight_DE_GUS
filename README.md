@@ -1,7 +1,7 @@
 # Insight Data Engineering Project 18B
 
 ## Project Idea (1-sentence):
-Monitor package usage and discussion to enable content creators insights into new and trending packages.
+Monitor package usage and discussion to enable content creators to gain insights into new and trending packages.
 
 ## What is the purpose, and most common use cases?
 Provide an analytics dashboard monitoring of package usage and mentions in social media to gain insights into popularity of packages.
