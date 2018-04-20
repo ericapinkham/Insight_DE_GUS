@@ -1,4 +1,4 @@
-# Insight Data Engineering Project 17B
+# Insight Data Engineering Project 18B
 
 ## Project Idea (1-sentence):
 Monitor package usage and discussion to enable content creators insights into new and trending packages.
@@ -22,9 +22,10 @@ Monitoring of package usage and mentions in social media to gain insights into p
   * CouchDB
   * Riak
   * MySQL
+  * PostgreSQL
 
 * Front End
   * Play Framework
 
 ## Proposed architecture
-Kafka => Spark Streaming => AWS Redshift => Spark => MySQL => Play Framework
+[GitHub, Reddit, StackOverflow, Twitter] => Kafka => Spark Streaming => Cassandra => Spark => PostgreSQL => Play Framework
