@@ -9,4 +9,9 @@ Allow for monitoring of package use and distribution statistics to be available 
 * Write books
 
 ## Technology to Use
+* Kafka
 * Spark
+* Casandra
+
+## Proposed
+Use KAFKA
