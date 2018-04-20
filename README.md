@@ -6,7 +6,6 @@ Monitor package usage and discussion to enable content creators insights into ne
 ## What is the purpose, and most common use cases?
 Monitoring of package usage and mentions in social media to gain insights into popularity of packages.
 * Create Sweet Blogs
-![Sweet Python Blog](./sweet_python_blog.png)
 * Understand Package Adoption and Churn
 * Write Books
 
