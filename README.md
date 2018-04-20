@@ -28,4 +28,6 @@ Monitoring of package usage and mentions in social media to gain insights into p
   * Play Framework
 
 ## Proposed architecture
+![alt text](./de_stack.png)
+
 [GitHub, Reddit, StackOverflow, Twitter] => Kafka => Spark Streaming => Cassandra => Spark => PostgreSQL => Play Framework
