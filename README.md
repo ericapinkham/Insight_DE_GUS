@@ -11,20 +11,20 @@ Monitoring of package usage and mentions in social media to gain insights into p
 
 ## Which technologies are well-suited to solve those challenges? (list all relevant)
 * Ingestion and Processing
-..* Kafka
-..* Spark Streaming
-..* Spark
+  * Kafka
+  * Spark Streaming
+  * Spark
 
 * Storage
-..* AWS Redshift
-..* Casandra
-..* Vertica
-..* CouchDB
-..* Riak
-..* MySQL
+  * AWS Redshift
+  * Casandra
+  * Vertica
+  * CouchDB
+  * Riak
+  * MySQL
 
 * Front End
-..* Play Framework
+  * Play Framework
 
 ## Proposed architecture
 Kafka => Spark Streaming => AWS Redshift => Spark => MySQL => Play Framework
