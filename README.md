@@ -10,12 +10,14 @@ Provide an analytics dashboard monitoring of package usage and mentions in socia
 * Create Sweet Blogs About New and Interesting Packages: "I wrote a blog post about Pandas, now what?"
 * Understand Package Adoption and Churn: "We implemented a sweet feature and look at our adoption!"
 * Write Books: "Which packages should we include in our book about Haskell?"
+* Enable Developers to Understand Package Usage: "We intended our package to be used for X but almost everyone uses it for Y."
 
 ### Some possibly useful things to track:
 * Metrics:
   * Package "Churn"
   * Trending packages (mentions on social media)
   * Inclusion normalized by "active" repositories
+  * Which functions are being used?
 * Dimensions:
   * Programming Language?
   * Domain (i.e. slicing by "dataframes" provides results for Pandas etc)?
@@ -29,7 +31,6 @@ Provide an analytics dashboard monitoring of package usage and mentions in socia
   * Kafka
   * Spark Streaming
   * Spark
-
 * Storage
   * AWS Redshift
   * Casandra
@@ -38,7 +39,6 @@ Provide an analytics dashboard monitoring of package usage and mentions in socia
   * Riak
   * MySQL
   * PostgreSQL
-
 * Front End
   * Play Framework
 
