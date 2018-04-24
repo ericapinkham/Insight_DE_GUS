@@ -59,4 +59,4 @@ Some possible secondary metrics to include if
   * Play Framework
 
 ## Proposed architecture
-![Data Engineering Stack](./de_stack.png)
+![Data Engineering Stack](./src/main/resources/de_stack.png)
