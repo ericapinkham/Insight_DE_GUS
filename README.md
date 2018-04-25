@@ -18,7 +18,7 @@ Give content creators a sense of which packages are used and trending.
 * Tracking a user's use of a package. I.e. determining if a particular user actually knows a given package.
 
 ## Metrics
-The main purpose here will be to track which packages are trending.
+The main purpose here will be to track which packages are trending. test.
 
 ### Primary Metric
 The primary metric, *popularity*, will be a weighted sum of the following:
