@@ -19,7 +19,7 @@ object GithubCommitExtractor {
   case class FileList(files: List[File])
 
   object CommitFileProtocol extends DefaultJsonProtocol {
-    implicit val FileFormat = jsonFormat10(File))
+    implicit val FileFormat = jsonFormat10(File)
   }
 
   import CommitFileProtocol._
