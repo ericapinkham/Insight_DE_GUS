@@ -1,23 +1,9 @@
-import Extractor.GithubCommitExtractor.extractCommitMetaData
-import scala.io.Source
-import java.io._
-
-// FileWriter
-val outputFile = new File("/home/eric/Insight/testing_data/output.txt")
-val bw = new BufferedWriter(new FileWriter(outputFile))
-
-val file = Source.fromFile("/home/eric/Insight/testing_data/github_test_100.json").getLines()
-
-for (line <- file) {
-  bw.write(extractCommitMetaData(removeObjectId(line)).mkString(" || "))
-}
 
 
 
-def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
 
 
 
-val json = """{ "_id" : ObjectId( "5adfe2106480fd2358c5b06a" ), "sha" : "2d9f95bd2c9ea7401f8ec935702f4e02035e242c", "commit" : { "author" : { "name" : "Anappwilos", "email" : "anappwilos@gmail.com", "date" : "2018-04-25T02:01:50Z" }, "committer" : { "name" : "Anappwilos", "email" : "anappwilos@gmail.com", "date" : "2018-04-25T02:01:50Z" }, "message" : "AC-N23717 : CR 'AC23717/'", "tree" : { "sha" : "4ac2c56ab7a6edb0b23a1d431c2334fed6e669ae", "url" : "https://api.github.com/repos/anappwilos/AutoCommit/git/trees/4ac2c56ab7a6edb0b23a1d431c2334fed6e669ae" }, "url" : "https://api.github.com/repos/anappwilos/AutoCommit/git/commits/2d9f95bd2c9ea7401f8ec935702f4e02035e242c", "comment_count" : 0, "verification" : { "verified" : false, "reason" : "unsigned", "signature" : null, "payload" : null } }, "url" : "https://api.github.com/repos/anappwilos/AutoCommit/commits/2d9f95bd2c9ea7401f8ec935702f4e02035e242c", "html_url" : "https://github.com/anappwilos/AutoCommit/commit/2d9f95bd2c9ea7401f8ec935702f4e02035e242c", "comments_url" : "https://api.github.com/repos/anappwilos/AutoCommit/commits/2d9f95bd2c9ea7401f8ec935702f4e02035e242c/comments", "author" : { "login" : "anappwilos", "id" : 29914357, "avatar_url" : "https://avatars3.githubusercontent.com/u/29914357?v=4", "gravatar_id" : "", "url" : "https://api.github.com/users/anappwilos", "html_url" : "https://github.com/anappwilos", "followers_url" : "https://api.github.com/users/anappwilos/followers", "following_url" : "https://api.github.com/users/anappwilos/following{/other_user}", "gists_url" : "https://api.github.com/users/anappwilos/gists{/gist_id}", "starred_url" : "https://api.github.com/users/anappwilos/starred{/owner}{/repo}", "subscriptions_url" : "https://api.github.com/users/anappwilos/subscriptions", "organizations_url" : "https://api.github.com/users/anappwilos/orgs", "repos_url" : "https://api.github.com/users/anappwilos/repos", "events_url" : "https://api.github.com/users/anappwilos/events{/privacy}", "received_events_url" : "https://api.github.com/users/anappwilos/received_events", "type" : "User", "site_admin" : false }, "committer" : { "login" : "anappwilos", "id" : 29914357, "avatar_url" : "https://avatars3.githubusercontent.com/u/29914357?v=4", "gravatar_id" : "", "url" : "https://api.github.com/users/anappwilos", "html_url" : "https://github.com/anappwilos", "followers_url" : "https://api.github.com/users/anappwilos/followers", "following_url" : "https://api.github.com/users/anappwilos/following{/other_user}", "gists_url" : "https://api.github.com/users/anappwilos/gists{/gist_id}", "starred_url" : "https://api.github.com/users/anappwilos/starred{/owner}{/repo}", "subscriptions_url" : "https://api.github.com/users/anappwilos/subscriptions", "organizations_url" : "https://api.github.com/users/anappwilos/orgs", "repos_url" : "https://api.github.com/users/anappwilos/repos", "events_url" : "https://api.github.com/users/anappwilos/events{/privacy}", "received_events_url" : "https://api.github.com/users/anappwilos/received_events", "type" : "User", "site_admin" : false }, "parents" : [ { "sha" : "808a9e296b91bfdd4e974f2c4d3146f856e72cf2", "url" : "https://api.github.com/repos/anappwilos/AutoCommit/commits/808a9e296b91bfdd4e974f2c4d3146f856e72cf2", "html_url" : "https://github.com/anappwilos/AutoCommit/commit/808a9e296b91bfdd4e974f2c4d3146f856e72cf2" } ], "stats" : { "total" : 0, "additions" : 0, "deletions" : 0 }, "files" : [ { "sha" : "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", "filename" : "AC23717/Readme.md", "status" : "added", "additions" : 0, "deletions" : 0, "changes" : 0, "blob_url" : "https://github.com/anappwilos/AutoCommit/blob/2d9f95bd2c9ea7401f8ec935702f4e02035e242c/AC23717/Readme.md", "raw_url" : "https://github.com/anappwilos/AutoCommit/raw/2d9f95bd2c9ea7401f8ec935702f4e02035e242c/AC23717/Readme.md", "contents_url" : "https://api.github.com/repos/anappwilos/AutoCommit/contents/AC23717/Readme.md?ref=2d9f95bd2c9ea7401f8ec935702f4e02035e242c" } ] }"""
 
-json.parseJson.asJsonObject.prettyPrint()
+
+

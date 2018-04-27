@@ -26,8 +26,7 @@ object GithubCommits{
 
 
 
-  def parseCommit(rawCommit: String): (String, String) = {
-
+  def parseCommit(rawCommit: String): List[(String, String)] = {
     GithubCommitExtractor.extractCommitMetaData(rawCommit)
   }
 
