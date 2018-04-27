@@ -17,3 +17,4 @@ libraryDependencies ++= Seq(
 
 // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-aws
 libraryDependencies += "org.apache.hadoop" % "hadoop-aws" % "2.6.0"
+libraryDependencies += "io.spray" %%  "spray-json" % "1.3.3"

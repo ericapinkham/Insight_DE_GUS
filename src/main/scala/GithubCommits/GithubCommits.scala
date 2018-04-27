@@ -10,21 +10,21 @@ import scala.util.parsing.json
 object GithubCommits{
   // This is a dumb starting point to attempt to get spark to read some json commits
   def main(): Unit = { //args: Array[String]
-//    val conf = new SparkConf()
-//      .setAppName("SparkMe Application")
-  //      .setMaster("local[*]")  // local mode
+
     val spark = SparkSession
                 .builder()
-                .appName("Trying to read from s3")
+                .appName("Parsing GithubCommits")
                 .getOrCreate()
 
     val sc = spark.sparkContext
 
-    val testfile = sc.textFile("/home/eric/Insight/testing_data/github_test_1000.json")
+    val testFile = sc.textFile("/home/eric/Insight/testing_data/github_test_1000.json")
 
-    val asd = for (line <- testfile) {
+    val asd = for (line <- testFile) {
       println(json.JSON.parseFull(line))
     }
+
+    val whatever = sc.parallelize(1 to 3).filter(_ )
 
 //    println(asd.count())
 //
