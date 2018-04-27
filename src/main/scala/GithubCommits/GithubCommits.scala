@@ -1,9 +1,11 @@
 //package GithubCommits
 //import org.apache.spark
 //import org.apache.spark
-import org.apache.spark.{SparkConf, SparkContext}
+// import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.explode
 //import org.apache.hadoop.fs.s3a.S3AFileSystem
+import scala.util.parsing.json
 
 object GithubCommits{
   // This is a dumb starting point to attempt to get spark to read some json commits
@@ -11,28 +13,35 @@ object GithubCommits{
 //    val conf = new SparkConf()
 //      .setAppName("SparkMe Application")
   //      .setMaster("local[*]")  // local mode
-  val spark = SparkSession
-            .builder()
-            .appName("Tring to read from s3")
-            .getOrCreate()
+    val spark = SparkSession
+                .builder()
+                .appName("Trying to read from s3")
+                .getOrCreate()
 
+    val sc = spark.sparkContext
 
-//    // 2. Create Spark context
-//    val sc = new SparkContext(conf)
+    val testfile = sc.textFile("/home/eric/Insight/testing_data/github_test_1000.json")
+
+    val asd = for (line <- testfile) {
+      println(json.JSON.parseFull(line))
+    }
+
+//    println(asd.count())
 //
-
-//    val testfile = sc.testfileextFile("s3a://githubtorrent/github_test_2.json")
-
-//    for (line <- testfile) println(line)
+//    val df = spark.read.json("/home/eric/Insight/testing_data/github_test_1000.json")
 //
-//    // Creates a DataFrame from json file
-//    val dataSet = 2
-    val df = spark.read.json("/home/eric/Insight/testing_data/github_test_2.json")
-//    val df = spark.read.json(sc)
+//    df.createOrReplaceTempView("Commits")
+//    val additions = spark.sql("SELECT files.element.additions from Commits")
+////    sc.parallelize(1 to 3).filter()
+////    df.select(explod)
+////    val additions = df.select(explode(df("files.element.additions")))
+////    queryResult.write.csv("./test.csv")
 //
-//    // Look at the schema of this DataFrame for debugging.
-//    df.show()
-    df.printSchema()
+//    for (line <- additions) println(line)
+
+//    df.temp
+
+//    df.printSchema()
 
   }
 }

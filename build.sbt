@@ -16,4 +16,4 @@ libraryDependencies ++= Seq(
 )
 
 // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-aws
-//libraryDependencies += "org.apache.hadoop" % "hadoop-aws" % "2.6.0"
+libraryDependencies += "org.apache.hadoop" % "hadoop-aws" % "2.6.0"
