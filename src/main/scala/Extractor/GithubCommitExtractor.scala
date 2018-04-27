@@ -1,4 +1,4 @@
-package GithubCommits
+package Extractor
 
 import spray.json._
 
@@ -13,7 +13,7 @@ object GithubCommitExtractor {
                   status: String,
                   sha: String ,
                   deletions: Int,
-                  patch: String,
+                  patch: Option[String],
                   blob_url: String
                  )
   case class FileList(files: List[File])
@@ -26,6 +26,8 @@ object GithubCommitExtractor {
 
   // Nice extractor method
   def extractCommitMetaData(rawJson: String): List[(String, String)] = {
+    def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
+
     def extractFile(file: File): (String, String) =
       file match {
         case File(additions,
@@ -38,10 +40,10 @@ object GithubCommitExtractor {
         deletions,
         patch,
         blob_url
-        ) => (filename, patch)
+        ) => (filename, patch.getOrElse(""))
         case _ => ("", "")
       }
 
-    rawJson.parseJson.asJsObject.getFields("files").head.convertTo[List[File]].map(extractFile)
+    removeObjectId(rawJson).parseJson.asJsObject.getFields("files").head.convertTo[List[File]].map(extractFile)
   }
 }
