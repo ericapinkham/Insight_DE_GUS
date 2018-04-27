@@ -1,28 +1,43 @@
 //package GithubCommits
 //import org.apache.spark
 //import org.apache.spark
-//import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+//import org.apache.hadoop.fs.s3a.S3AFileSystem
 
 object GithubCommits{
   // This is a dumb starting point to attempt to get spark to read some json commits
-  def main(): Unit = {
-    val spark = SparkSession
-      .builder()
-      .appName("Spark SQL with UDF")
-      .getOrCreate()
+  def main(): Unit = { //args: Array[String]
+//    val conf = new SparkConf()
+//      .setAppName("SparkMe Application")
+  //      .setMaster("local[*]")  // local mode
+  val spark = SparkSession
+            .builder()
+            .appName("Tring to read from s3")
+            .getOrCreate()
 
-    // Creates a DataFrame from json file
-    val dataSet = 2
-//    val df = spark.read.json("/home/eric/Insight/testing_data/super_simple.json")
-    val df = spark.read.json(s"/home/eric/Insight/testing_data/github_test_$dataSet.json")
 
-    // Look at the schema of this DataFrame for debugging.
-    df.show()
+//    // 2. Create Spark context
+//    val sc = new SparkContext(conf)
+//
+
+//    val testfile = sc.testfileextFile("s3a://githubtorrent/github_test_2.json")
+
+//    for (line <- testfile) println(line)
+//
+//    // Creates a DataFrame from json file
+//    val dataSet = 2
+    val df = spark.read.json("/home/eric/Insight/testing_data/github_test_2.json")
+//    val df = spark.read.json(sc)
+//
+//    // Look at the schema of this DataFrame for debugging.
+//    df.show()
     df.printSchema()
 
   }
 }
+
+
 
 //
 //// For implicit conversions like converting RDDs to DataFrames

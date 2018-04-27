@@ -14,3 +14,6 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion
 )
+
+// https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-aws
+//libraryDependencies += "org.apache.hadoop" % "hadoop-aws" % "2.6.0"
