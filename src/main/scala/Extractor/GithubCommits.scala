@@ -1,34 +1,33 @@
 package Extractor
-//import org.apache.spark
-//import org.apache.spark
-// import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-import Extractor.GithubCommitExtractor
+import Extractor.GithubCommitExtractor.extractCommitMetaData
 
+object GithubCommits {
 
-object GithubCommits{
-  // This is a dumb starting point to attempt to get spark to read some json commits
-  def main(): Unit = { //args: Array[String]
-
+  def main(args: Array[String]): Unit = {
+    // Get or create spark and sc
     val spark = SparkSession
-                .builder()
-                .appName("Parsing GithubCommits")
-                .getOrCreate()
+      .builder()
+      .appName("Parsing GithubCommits")
+      .getOrCreate()
 
     val sc = spark.sparkContext
 
-    val testFile = sc.textFile("/home/eric/Insight/testing_data/github_test_1000.json")
+    // Read text file in spark RDD
+    val extractedBsonCommits = sc.textFile("/home/eric/Insight/testing_data/github_test_1000.json")
 
-    val whatever = sc.parallelize(1 to 3).filter(_ )
+    val splitRdd = extractedBsonCommits.map { s => extractCommitMetaData(s)}
 
+    // printing values
+    splitRdd.foreach(println)
 
+    // how to store split values in different column and write it into file
   }
 
 
 
-  def parseCommit(rawCommit: String): List[(String, String)] = {
-    GithubCommitExtractor.extractCommitMetaData(rawCommit)
-  }
+
+
 
 }
 
