@@ -44,6 +44,13 @@ object GithubCommitExtractor {
         case _ => ("", "")
       }
 
-    removeObjectId(rawJson).parseJson.asJsObject.getFields("files").head.convertTo[List[File]].map(extractFile)
+    try {
+      removeObjectId(rawJson).parseJson.asJsObject.getFields("files").head.convertTo[List[File]].map(extractFile)
+    } catch  {
+      case jsonSucks: spray.json.DeserializationException => List(("", ""))
+      case _ => List(("",""))
+    }
+
+
   }
 }

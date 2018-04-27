@@ -1,5 +1,7 @@
 # Insight Data Engineering Project 18B
 
+
+
 ## Project Idea (1-sentence):
 Monitor package usage and discussion to enable content creators to gain insights into new and trending packages.
 
@@ -42,29 +44,20 @@ Some possible secondary metrics to include if
 * Programming Language?
 * Domain (i.e. slicing by "dataframes" provides results for Pandas etc)?
 
-## Which technologies are well-suited to solve those challenges? (list all relevant)
-* Ingestion and Processing
-  * Kafka
-  * Spark Streaming
-  * Spark
-* Storage
-  * AWS Redshift
-  * Casandra
-  * Vertica
-  * CouchDB
-  * Riak
-  * MySQL
-  * PostgreSQL
-* Front End
-  * Play Framework
+## What are the primary engineering challenges? -> Why would a Data Engineering Hiring Manager care about this project
+A lot of the challenges will be involved in getting and joining dimensions to enable interesting analysis.
 
 ## Proposed architecture
 ![Data Engineering Stack](./src/main/resources/de_stack.png)
 
+## What are the (quantitative) specifications/constraints for this project?
+There will be a considerable amount of data once the pipeline is up and running.
+
 ## Data
 
 ### 
-The primary source fo data for the github commits is pulled from mongodb dumps converted to json:
+The primary source fo data for the github commits is pulled from mongodb dumps converted to json. 
+The data is dumped daily and contains roughly 100 GB of commit data.
 
     root
      |-- _id: string (nullable = true)
@@ -136,6 +129,7 @@ The primary source fo data for the github commits is pulled from mongodb dumps c
      |    |    |-- raw_url: string (nullable = true)
      |    |    |-- sha: string (nullable = true)
      |    |    |-- status: string (nullable = true)
+     |    |    |-- patch: string (nullable = true)
      |-- html_url: string (nullable = true)
      |-- parents: array (nullable = true)
      |    |-- element: struct (containsNull = true)
