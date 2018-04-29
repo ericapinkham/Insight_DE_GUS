@@ -8,7 +8,7 @@ import org.apache.spark.sql.SparkSession
 
 
 object MySQLTest extends MySQLConnection {
-  def main() {
+  def main(args: Array[String]) {
     // Spark
     
     val sparkSession = SparkSession

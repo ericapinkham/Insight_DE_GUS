@@ -1,9 +1,6 @@
 package Extractor
 import org.apache.spark.SparkContext
-import Extractor.GithubCommitExtractor.parseMetaData
-
-
-import scala.io.Source.fromFile
+import Extractor.GithubCommitExtractor.extract
 
 object GithubCommits {
 
@@ -22,7 +19,7 @@ object GithubCommits {
     val commitsRDD = sc.textFile(fileName)
     
     // Extract meta data
-    val splitRdd = commitsRDD.map { s => parseMetaData(s)}
+    val splitRdd = commitsRDD.map { s => extract(s)}
 
     // printing values
     splitRdd.foreach(println)
