@@ -15,10 +15,11 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql" % sparkVersion
 )
 
-// https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-aws
-//libraryDependencies += "org.apache.hadoop" % "hadoop-aws" % "2.6.0"
-libraryDependencies += "io.spray" %%  "spray-json" % "1.3.3"
-libraryDependencies += "mysql" % "mysql-connector-java" % "6.0.5"
+
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.7"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+
+// libraryDependencies += "mysql" % "mysql-connector-java" % "6.0.5"
 
 // Dealing with conflicting file paths
 //assemblyMergeStrategy in assembly := {
