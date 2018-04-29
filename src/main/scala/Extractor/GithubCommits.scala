@@ -1,8 +1,11 @@
 package Extractor
-import org.apache.spark.SparkContext
-import Extractor.GithubCommitExtractor.extract
 
-object GithubCommits {
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.{SparkConf, SparkContext}
+import Extractor.GithubCommitExtractor.extract
+import org.apache.spark.sql.functions.to_timestamp
+
+object GithubCommits extends MySQLConnection {
 
   def main(args: Array[String]): Unit = {
     // Extract the arguments
@@ -12,18 +15,19 @@ object GithubCommits {
     }
     
     // setup the spark context
-	  val sc = SparkContext.getOrCreate()
+    val conf = new SparkConf().setMaster("local").setAppName("Dataframe")
+    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder().getOrCreate()
+    import spark.implicits._
     
-
+//	  val sc = SparkContext.getOrCreate()
+    
     // Read text file into spark RDD
-    val commitsRDD = sc.textFile(fileName)
+    val commitsRDD = sc.textFile(fileName).flatMap{ s => extract(s)}.toDF()
     
-    // Extract meta data
-    val splitRdd = commitsRDD.map { s => extract(s)}
-
-    // printing values
-    splitRdd.foreach(println)
-
+    val ts = to_timestamp($"commit_timestamp", "yyyy-MM-dd'T'hh:mm:ss'Z'")
+    commitsRDD.withColumn("commit_timestamp", ts).write.mode(SaveMode.Append).jdbc(connectionString, "GithubData", jdbcProperties)
+    
     // how to store split values in different column and write it into file
   }
 }

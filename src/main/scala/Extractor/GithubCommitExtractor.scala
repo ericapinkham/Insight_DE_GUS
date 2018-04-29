@@ -2,24 +2,16 @@ package Extractor
 
 import play.api.libs.json._
 
+
 object GithubCommitExtractor extends PackageExtractor {
   // Set aside the fields we care about
-  /*
-  commit_timestamp DATETIME NOT NULL,
-  user_email VARCHAR(255),
-  commit_message TEXT,
-  file_name VARCHAR(32) NOT NULL,
-  -- patch TEXT,
-  language_name VARCHAR(32) NOT NULL,
-  package_name VARCHAR(32) NOT NULL,
-  usage_count INT NOT NULL DEFAULT 1
-  */
-  def extract(rawJson: String): List[(String, String, String, String, String, String, Int)] = {
+  
+  def extract(rawJson: String): List[Commit] = {
     val lol = for (file <- parseMetaData(rawJson) )
       yield file match {
         case date :: email :: message :: filename :: status :: patch :: Nil =>
           extractPackages(extractLanguage(filename), patch).map{
-            case (count, packageName) => (date, email, message, filename, extractLanguage(filename), packageName, count)
+            case (count, packageName) => new Commit(date, email, message, filename, extractLanguage(filename), packageName, count)
           }
         case _ => throw new Error("Incorrect output from something")
     }

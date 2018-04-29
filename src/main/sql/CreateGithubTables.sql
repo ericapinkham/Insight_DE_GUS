@@ -4,16 +4,14 @@
 DROP TABLE IF EXISTS GithubData ;
 
 CREATE TABLE GithubData (
-	commit_timestamp DATETIME NOT NULL,
+	commit_timestamp DATETIME,
     user_email VARCHAR(255),
     commit_message TEXT,
-    file_name VARCHAR(32) NOT NULL,
+    file_name TEXT,
     -- patch TEXT, 
-    language_name VARCHAR(32) NOT NULL,
-    package_name VARCHAR(32) NOT NULL,
-    usage_count INT NOT NULL DEFAULT 1
+    language_name VARCHAR(32),
+    package_name VARCHAR(255),
+    usage_count INT
     )
 ;
-
-
 
