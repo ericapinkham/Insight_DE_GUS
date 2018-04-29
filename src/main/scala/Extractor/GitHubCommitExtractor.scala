@@ -3,7 +3,7 @@ package Extractor
 import play.api.libs.json._
 
 
-object GithubCommitExtractor extends PackageExtractor {
+object GitHubCommitExtractor extends PackageExtractor {
   // Set aside the fields we care about
   
   def extract(rawJson: String): List[Commit] = {
