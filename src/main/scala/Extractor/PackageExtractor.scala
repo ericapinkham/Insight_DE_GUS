@@ -4,14 +4,20 @@ import scala.util.matching.Regex
 
 trait PackageExtractor {
   
-  val languageNames: Map[String, String] = Map(
-    "py" -> "python",
-    "hs" -> "haskell",
-    "scala" -> "scala",
-    "java" -> "java",
-    "js" -> "javascript"
-  )
-  val languagePatterns: Map[String, List[Regex]] = Map("python" -> List("""(\+|\-)import\s(\w+?)(?:\s|$)""".r, """(\+|\-)from\s(\w+?)\simport\s(?:[A-Za-z])""".r))
+  val languageNames: Map[String, String] =
+    Map(
+      "py" -> "python",
+      "hs" -> "haskell",
+      "scala" -> "scala",
+      "java" -> "java",
+      "js" -> "javascript"
+    )
+  val languagePatterns: Map[String, List[String]] =
+    Map(
+      "python" -> List("""import\s+([0-9a-zA-Z]+)""", """from\s+(\w+?)\s+import\s+(?:[0-9a-zA-Z])"""),
+      "scala" -> List("""import\s+([0-9a-zA-Z\.]*[0-9a-zA-Z]+)"""),
+      "haskell" -> List("""import\s(?!qualified)([0-9a-zA-Z]+)""", """import\squalified\s([0-9a-zA-Z]+)""")
+    )
   
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {
@@ -20,8 +26,9 @@ trait PackageExtractor {
     }
   }
   
-  def extractPackages(language: String, patch: String): List[(Int, String)] =
-    languagePatterns.getOrElse(language, List[Regex]())
-      .flatMap(_.findAllMatchIn(patch).map(m => (if (m.group(1) == "+") 1 else -1, m.group(2))))
-  
+  def extractPackages(language: String, patch: String): List[(Int, String)] = {
+    def prepPattern(pattern: String): Regex = ("""(\+|\-)""" + pattern).r
+    languagePatterns.getOrElse(language, List[String]())
+      .flatMap(prepPattern(_).findAllMatchIn(patch).map(m => (if (m.group(1) == "+") 1 else -1, m.group(2))))
+  }
 }

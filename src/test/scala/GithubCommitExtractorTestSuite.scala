@@ -25,5 +25,32 @@ class GithubCommitExtractorTestSuite extends FunSuite {
   test("Package Extraction 01") {
     val pythonImports = "+from unittest import TestCase as TC, main\n+import time\n-import pandas"
     assert(extractPackages("python", pythonImports).toSet === Set((1, "unittest"), (1, "time"), (-1, "pandas")))
+    val scalaImports = """+import org.apache.spark
+                         |+import org.apache.spark.{SparkConf, SparkContext}
+                         |+import org.apache.spark.sql.SQLContext
+                         |-import org.apache.spark.sql.SparkSession"""
+    assert(extractPackages("scala", scalaImports).toSet ===
+      Set(
+        (1, "org.apache.spark"),
+        (1, "org.apache.spark.sql.SQLContext"),
+        (-1, "org.apache.spark.sql.SparkSession")
+      )
+    )
+    val haskellImports = """+import Mod1
+                           |+import Mod2 (x,y)
+                           |-import qualified Mod3
+                           |-import qualified Mod4
+                           |+import Mod5 hiding (x,y)
+                           |+import qualified Mod6"""
+    assert(extractPackages("haskell", haskellImports).toSet ===
+      Set(
+        (1, "Mod1"),
+        (1, "Mod2"),
+        (-1, "Mod3"),
+        (-1, "Mod4"),
+        (1, "Mod5"),
+        (1, "Mod6")
+      )
+    )
   }
 }
