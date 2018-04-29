@@ -1,0 +1,31 @@
+2018 StackOverflow "most loved languages" with file extensions obtained from wikipedia.
+https://insights.stackoverflow.com/survey/2018/#most-loved-dreaded-and-wanted
+most loved means ""% of developers who are developing with the language or technology and have expressed interest in continuing to develop with it"
+
+Rust: .rs, .rlib
+Kotlin: .kt, .kts
+Python: .py, .pyc, .pyd, .pyo, .pyw, .pyz
+TypeScript: .ts, .tsx
+Go: .go
+Swift: .swift
+JavaScript: .js
+C#: .cs
+F#: .fs, .fsi, .fsx, .fsscript
+Clojure: .clj, .cljs, .cljc, .edn
+Bash/Shell: .sh <- sketchy
+Scala: .scala, .sc
+SQL: .sql
+HTML: .html, .htm
+CSS: .css
+Haskell: .hs, .lhs
+Julia: .jl
+Java: .java, .class, .jar
+R: .r, .R, .RData, .rds, .rda
+Ruby: .rb
+Erlang: .erl .hrl
+C++: .C .cc .cpp .cxx .c++ .h .hh .hpp .hxx .h++
+Hack: .hh <- conflicts with C++
+PHP: .php, .phtml, .php3, .php4, .php5, .php7, .phps, .php-s
+Ocaml: .ml, .mli
+
+

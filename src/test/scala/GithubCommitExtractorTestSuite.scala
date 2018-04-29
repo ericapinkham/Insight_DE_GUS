@@ -1,5 +1,5 @@
 
-import Extractor.GithubCommitExtractor
+import Extractor.GithubCommitExtractor.{extractLanguage, parseMetaData, extractPackages}
 import org.scalatest.FunSuite
 
 class GithubCommitExtractorTestSuite extends FunSuite {
@@ -10,7 +10,20 @@ class GithubCommitExtractorTestSuite extends FunSuite {
   
   test("Json Extraction Test 01") {
     new TestJsonData {
-      assert(GithubCommitExtractor.parseMetaData(testJson).head.head === "2018-04-25T02:03:48Z")
+      assert(parseMetaData(testJson).head.head === "2018-04-25T02:03:48Z")
     }
+  }
+  
+  test("Language Extraction 01") {
+    assert(extractLanguage("hello_world.py") === "python")
+    assert(extractLanguage("     hello_world.hs       ") === "haskell")
+    assert(extractLanguage("hello_world.scala\n") === "scala")
+    assert(extractLanguage("hello_world.java\r\n") === "java")
+    assert(extractLanguage("hello_world.js") === "javascript")
+  }
+  
+  test("Package Extraction 01") {
+    val pythonImports = "+from unittest import TestCase as TC, main\n+import time\n-import pandas"
+    assert(extractPackages("python", pythonImports).toSet === Set((1, "unittest"), (1, "time"), (-1, "pandas")))
   }
 }

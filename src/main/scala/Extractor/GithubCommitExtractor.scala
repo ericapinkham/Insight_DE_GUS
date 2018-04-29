@@ -3,11 +3,15 @@ package Extractor
 import play.api.libs.json._
 
 
-object GithubCommitExtractor {
+object GithubCommitExtractor extends PackageExtractor {
   // Set aside the fields we care about
   
   def parseMetaData(rawJson: String): List[List[String]] = {
-    // helper methods
+    /**
+      *
+      * @param input
+      * @return
+      */
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
     
     def filesInfo(filesObject: JsValue): List[List[String]] = {
@@ -34,5 +38,5 @@ object GithubCommitExtractor {
   
     filesInfo(commit).map(commitInfo(commit) ::: _)
   }
-
+  
 }
