@@ -1,4 +1,4 @@
-package Extractor
+package Jobs
 
 /**
   * Store MySQL connection properties so that I don't have to do this all over the place

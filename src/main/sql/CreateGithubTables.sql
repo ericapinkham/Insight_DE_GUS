@@ -1,5 +1,5 @@
 
-
+USE insight;
 
 DROP TABLE IF EXISTS GitHubData ;
 
@@ -21,6 +21,6 @@ SELECT 	CAST(commit_timestamp AS DATE) AS date,
         SUM(usage_count) AS total_usage
 	FROM GitHubData
     GROUP BY 1, 2, 3
-    ORDER BY 4 DESC
+    ORDER BY 2 ASC, 4 DESC
 ;
 

@@ -1,4 +1,4 @@
-package Extractor
+package Jobs
 
 //import org.apache.spark
 //import org.apache.spark.{SparkConf, SparkContext}

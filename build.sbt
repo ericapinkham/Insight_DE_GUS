@@ -18,6 +18,15 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "6.0.5"
 )
 
+// Exclude jars in assembly
+assemblyExcludedJars in assembly := {
+  val cp = (fullClasspath in assembly).value
+  cp filter { f =>
+    f.data.getName.contains("spark-core") ||
+      f.data.getName.contains("spark-sql")
+  }
+}
+
 // Dealing with conflicting file paths
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard

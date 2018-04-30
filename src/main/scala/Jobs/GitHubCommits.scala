@@ -1,8 +1,8 @@
-package Extractor
+package Jobs
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
-import Extractor.GitHubCommitExtractor.extract
+import Jobs.Extractor.GitHubCommitExtractor.extract
 import org.apache.spark.sql.functions.to_timestamp
 
 object GitHubCommits extends MySQLConnection {
@@ -22,16 +22,12 @@ object GitHubCommits extends MySQLConnection {
     val sc = new SparkContext(conf)
     val spark = SparkSession.builder().getOrCreate()
     import spark.implicits._
-    
-//	  val sc = SparkContext.getOrCreate()
-    
-    // Read text file into spark RDD
+
+    // Read text file into spark RDD, map to Commit objects and convert to DF
     val commitsRDD = sc.textFile(fileName).flatMap{ s => extract(s)}.toDF()
     
-    val ts = to_timestamp($"commit_timestamp", "yyyy-MM-dd'T'hh:mm:ss'Z'")
+    val ts = to_timestamp($"commit_timestamp", "yyyy-MM-dd'T'hh:mm:ss'Z'") // for mapping timestamps so that MySQL can deal
     commitsRDD.withColumn("commit_timestamp", ts).write.mode(SaveMode.Append).jdbc(connectionString, "GitHubData", jdbcProperties)
-    
-    // how to store split values in different column and write it into file
   }
 }
 

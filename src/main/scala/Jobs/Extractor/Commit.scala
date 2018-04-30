@@ -1,6 +1,4 @@
-package Extractor
-
-import java.sql.Timestamp
+package Jobs.Extractor
 
 object Commit {
   def apply(tuple: (String, String, String, String, String, String, Int)): Commit = tuple match {

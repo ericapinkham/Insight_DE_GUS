@@ -1,5 +1,5 @@
 
-import Extractor.GitHubCommitExtractor.{extractLanguage, extract, extractPackages}
+import Jobs.Extractor.GitHubCommitExtractor.{extractLanguage, extract, extractPackages}
 import org.scalatest.FunSuite
 
 class GitHubCommitExtractorTestSuite extends FunSuite {
