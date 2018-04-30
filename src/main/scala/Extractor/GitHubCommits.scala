@@ -18,7 +18,7 @@ object GitHubCommits extends MySQLConnection {
     }
     
     // setup the spark context
-    val conf = new SparkConf().setMaster("local").setAppName("Dataframe")
+    val conf = new SparkConf().setAppName("Parsing GitHub Commits")
     val sc = new SparkContext(conf)
     val spark = SparkSession.builder().getOrCreate()
     import spark.implicits._
