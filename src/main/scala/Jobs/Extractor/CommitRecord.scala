@@ -1,26 +1,9 @@
 package Jobs.Extractor
 
-import play.api.libs.json.{JsValue, Json}
-
 import scala.util.matching.Regex
+import scala.util.parsing.json.JSON
 
 object CommitRecord extends Utils with Languages {
-  def apply(tuple: (String, String, String, String, String, String, String, Int)): CommitRecord = tuple match {
-    case (id, date, email, message, filename, language, packageName, count) => new CommitRecord(id.toInt, date, email, message, filename, language, packageName, count)
-  }
-
-  def apply(rawJson: String): List[CommitRecord] = {
-    val lol = for (file <- parseMetaData(rawJson) )
-      yield file match {
-        case id :: date :: email :: message :: filename :: status :: patch :: Nil =>
-          extractPackages(extractLanguage(filename), patch).map{
-            case (count, packageName) => new CommitRecord(id.toInt, date, email, message, filename, extractLanguage(filename), packageName, count)
-          }
-        case _ => throw new Error("Invalid parameter")
-      }
-    lol.flatten
-  }
-
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {
       case None => ""
@@ -34,45 +17,43 @@ object CommitRecord extends Utils with Languages {
       .flatMap(prepPattern(_).findAllMatchIn(patch).map(m => (if (m.group(1) == "+") 1 else if (m.group(1) == "-") -1 else 0, m.group(2))))
   }
 
-  private def parseMetaData(rawJson: String): List[List[String]] = {
-
-    def filesInfo(filesObject: JsValue): List[List[String]] = {
-      val fileFields = List("filename", "status", "patch") //commit/files/#/
-      val files = (filesObject \ "files").get.as[List[Map[String, JsValue]]]
-
-      def getIfDefined(file: Map[String, JsValue])(key: String): String =
-        if (file.isDefinedAt(key)) file(key).as[String] else ""
-
-      files.map(x => fileFields.map(getIfDefined(x)(_)))
+  def extractCommit(rawJson: String): List[CommitRecord] = {
+    try {
+      extract(rawJson)
+    } catch {
+      case _ => List[CommitRecord]()
     }
-
-    def commitInfo(commit: JsValue): List[String] = {
-      List(
-        commit \ "commit" \ "committer" \ "id",
-        commit \ "commit" \ "committer" \ "date",
-        commit \ "commit" \ "committer" \ "email",
-        commit \ "commit" \ "message"
-      ).map(_.getOrElse(notFound).as[String])
-    }
-
-    // Actually do the work
-    val commit = Json.parse(removeObjectId(rawJson))
-
-    filesInfo(commit).map(commitInfo(commit) ::: _)
   }
 
+  private def extract(rawJson: String): List[CommitRecord] = {
+    case class FileInfo(fileName: String, language: String, status: String, packageName: String, packageUsage: Int)
+    val jsonMap = JSON.parseFull(removeObjectId(rawJson))
+      .getOrElse(Map[String, Any]())
+      .asInstanceOf[Map[String, Any]]
+
+    val committerMap = jsonMap.getOrElse("committer", Map[String, Any]()).asInstanceOf[Map[String, Any]]
+    val id: Int = committerMap.getOrElse("id", null).asInstanceOf[Double].toInt
+    val date: String = committerMap.getOrElse("date", null).asInstanceOf[String]
+    val email: String = committerMap.getOrElse("email", null).asInstanceOf[String]
+    val message: String = committerMap.getOrElse("message", null).asInstanceOf[String]
+
+    val fileMaps = jsonMap.getOrElse("files", List[Map[String, Any]]()).asInstanceOf[List[Map[String, Any]]]
+    val fileTuples = fileMaps.map{f => (
+        f.getOrElse("filename", null).asInstanceOf[String],
+        extractLanguage(f.getOrElse("filename", null).asInstanceOf[String]),
+        f.getOrElse("status", null).asInstanceOf[String],
+        f.getOrElse("patch", null).asInstanceOf[String]
+      )
+    }
+
+    fileTuples.flatMap{
+      case (filename, language, status, patch) =>
+        extractPackages(language, patch).map{
+          case (count, packageName) =>
+            new CommitRecord(id, date, email, message, filename, language, packageName, count)
+      }
+    }
+  }
 }
 
-/*
-  commit_timestamp DATETIME NOT NULL,
-  user_email VARCHAR(255),
-  commit_message TEXT,
-  file_name VARCHAR(32) NOT NULL,
-  -- patch TEXT,
-  language_name VARCHAR(32) NOT NULL,
-  package_name VARCHAR(32) NOT NULL,
-  usage_count INT NOT NULL DEFAULT 1
-  */
-case class CommitRecord(id: Int, commit_timestamp: String, user_email: String, commit_message: String, file_name: String, language_name: String, package_name: String, usage_count: Int) {
-
-}
+case class CommitRecord(id: Int, commit_timestamp: String, user_email: String, commit_message: String, file_name: String, language_name: String, package_name: String, usage_count: Int)

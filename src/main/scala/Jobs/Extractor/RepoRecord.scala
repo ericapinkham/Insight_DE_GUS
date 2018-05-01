@@ -12,8 +12,14 @@ object RepoRecord extends Utils  {
       parsedJson \ "owner" \ "id",
       parsedJson \ "html_url",
       parsedJson \ "created_at"
-    ).map(_.getOrElse(notFound).as[String]) match {
-      case id :: name :: owner_id :: html_url :: created_at :: Nil => new RepoRecord(id.toInt, name, owner_id, html_url, created_at)
+    ) match {
+      case id :: name :: owner_id :: html_url :: created_at :: Nil =>
+        new RepoRecord(
+          id.as[Int],
+          name.as[String],
+          owner_id.as[String],
+          html_url.as[String],
+          created_at.as[String])
       case _ => throw new Error("Error creating repo record")
     }
 
