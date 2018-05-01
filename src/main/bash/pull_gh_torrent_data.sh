@@ -1,9 +1,10 @@
 #!/bin/bash
 
-wget <path to new dump>
+
+wget <new dump>
 
 tar -xvvf <new file>
 
 
 
-aws s3 cp <new file>
+hadoop fs -put
