@@ -26,13 +26,23 @@ object ExtractGitHubData extends MySQLConnection {
     import spark.implicits._
 
     // Read text files into spark RDD, map to objects and convert to DF
-    val commitsDf = sc.textFile(s"$dataDirectory/commits.json").flatMap{s => extractCommit(s)}.toDF
 
-    val usersDf = sc.textFile(s"$dataDirectory/users.json").map(s => UserRecord(s)).filter(_.id != 0).toDF
+
+    val commitsDf = sc.textFile(s"$dataDirectory/commits.json")
+      .flatMap{s => extractCommit(s)}
+      .toDF()
+
+
+    val usersDf = sc.textFile(s"$dataDirectory/users.json")
+      .map(s => UserRecord(s))
+      .filter(_.id != 0)
+      .keyBy(_.id)
+      .reduceByKey{_ + _}
+      .toDF()
 
 //    val reposDf = sc.textFile(s"$dataDirectory/repos.json").map(s => RepoRecord(s)).toDF
 
-    val resultDf = commitsDf.join(usersDf, Seq("id"), "left_outer")
+    val resultDf = commitsDf.join(sc.broadcast(usersDf).value, Seq("id"), "left_outer")
 
     resultDf.write.parquet(s"$dataDirectory/github_data.parquet")
 //    resultDf.show()

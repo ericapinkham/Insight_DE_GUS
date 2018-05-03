@@ -117,10 +117,10 @@ app.layout = html.Div( #style = {"backgroundColor": colors["background"], "color
 ])
 
 @app.callback(
-    dash.dependencies.Output("package_dropdown", "options"),
-    [dash.dependencies.Input("language_dropdown", "value")])
+    Output("package_dropdown", "options"),
+    [Input("language_dropdown", "value")])
 def language_dropdown(language):
-    db_connection = sql.connect(host="ec2-35-161-183-67.us-west-2.compute.amazonaws.com", port="3306", database="insight", user="root", password="password")
+    db_connection = sql.connect(host = "ec2-35-161-183-67.us-west-2.compute.amazonaws.com", port = "3306", database = "insight", user = "root", password = "password")
     unique_packages = pd.read_sql("SELECT DISTINCT(package_name) package FROM GitHubData WHERE language_name = '{}'".format(language), db_connection)
     return [{"label": l, "value": l} for l in unique_packages.package]
 
@@ -161,7 +161,7 @@ def update_package_table(language, begin_date, end_date):
     [State("begin_date", "date"), State("end_date", "date")])
 def update_graph(language, packages, begin_date, end_date):
     if len(packages) == 0:
-        return go.Figure(
+        return  go.Figure(
                 data=[],
                 layout=go.Layout(
                     title='Packages!!!',
