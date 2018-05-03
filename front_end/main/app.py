@@ -15,8 +15,9 @@ import data_access_layer as dal
 # Set up the MySQL Connection
 
 # Here"s my cool App
-server = Flask(__name__)
-app = dash.Dash(__name__, server=server)
+server = Flask(__name__
+)
+app = dash.Dash(__name__, server = server)
 
 colors = {
     "background": "#111111",
@@ -45,7 +46,7 @@ this is text explaining the project?
 intro = dcc.Markdown(children = markdown_text)
 
 # Get a list of unique languages from MySQL. This should probably be precomputed
-# df = pd.read_sql("SELECT * FROM GitHubData", con=db_connection)
+# df = pd.read_sql("SELECT * FROM GitHubData", con = db_connection)
 
 # Define the components
 unique_languages = dal.get_unique_languages()
@@ -62,25 +63,25 @@ package_dropdown = dcc.Dropdown(
 
 begin_date = dcc.DatePickerSingle(
     id="begin_date",
-    date=dt(2018, 1, 1)
+    date = dt(2018, 1, 1)
 )
 
 end_date = dcc.DatePickerSingle(
     id="end_date",
-    date=dt(2018, 5, 24)
+    date = dt(2018, 5, 24)
 )
 
 graph = dcc.Graph(
-    figure=go.Figure(
+    figure = go.Figure(
         data=[],
-        layout=go.Layout(
+        layout = go.Layout(
             title='Packages!!!',
-            showlegend=True,
-            legend=go.Legend(
-                x=0,
-                y=1.0
+            showlegend = True,
+            legend = go.Legend(
+                x = 0,
+                y = 1.0
             ),
-            margin=go.Margin(l=40, r=0, t=40, b=30)
+            margin = go.Margin(l = 40, r = 0, t = 40, b = 30)
         )
     ),
     style={'height': 300},
@@ -113,7 +114,7 @@ def language_dropdown(language):
     unique_packages = dal.get_packages_by_language(language)
     return [{"label": l, "value": l} for l in unique_packages.package]
 
-def generate_table(dataframe, max_rows=10):
+def generate_table(dataframe, max_rows = 10):
     return html.Table(
         # Header
         [html.Tr([html.Th(col) for col in dataframe.columns])] +
@@ -138,18 +139,8 @@ def update_package_table(language, begin_date, end_date):
     [State("begin_date", "date"), State("end_date", "date")])
 def update_graph(language, packages, begin_date, end_date):
     if packages == None:
-        return go.Figure(
-                data=[],
-                layout=go.Layout(
-                    title='Packages!!!',
-                    showlegend=True,
-                    legend=go.Legend(
-                        x=0,
-                        y=1.0
-                    ),
-                    margin=go.Margin(l=40, r=0, t=40, b=30)
-                )
-            )
+        return None
+
     package_data = dal.get_usage_by_import(language, packages, begin_date, end_date)
     colors = gen_colors(len(packages))
 
@@ -162,23 +153,18 @@ def update_graph(language, packages, begin_date, end_date):
             name = package,
             marker = go.Marker(color = rgb)
             )
-
     return go.Figure(
             data=[make_trace(package_data, package, colors[i]) for i, package in enumerate(packages)],
-            layout=go.Layout(
+            layout = go.Layout(
                 title='Packages!!!',
-                showlegend=True,
-                legend=go.Legend(
-                    x=0,
-                    y=1.0
-                ),
-                margin=go.Margin(l=40, r=0, t=40, b=30)
+                showlegend = True,
+                legend = go.Legend(x = 0, y = 1.0),
+                margin = go.Margin(l = 40, r = 0, t = 40, b = 30)
+                )
             )
-        )
-
 def gen_colors(n):
     HSV_tuples = [(x*1.0/n, 0.5, 0.5) for x in range(n)]
     return list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))
 
 if __name__ == "__main__":
-    app.run_server(debug=True, host="0.0.0.0")
+    app.run_server(debug = True, host="0.0.0.0")
