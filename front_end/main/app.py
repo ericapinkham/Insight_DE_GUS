@@ -3,19 +3,20 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import mysql.connector as sql
+
 import pandas as pd
 from datetime import date as dt
 import plotly.graph_objs as go
-import dash_table_experiments as table
 from dash.dependencies import Input, Output, State
-from mysql.connector.constants import SQLMode
 import colorsys
+from flask import Flask
+import data_access_layer as dal
 
 # Set up the MySQL Connection
 
 # Here"s my cool App
-app = dash.Dash()
+server = Flask(__name__)
+app = dash.Dash(__name__, server=server)
 
 colors = {
     "background": "#111111",
@@ -26,6 +27,7 @@ title = html.H1(
     children="Package Tracker",
     style={"textAlign": "center", "color": colors["text"]}
     )
+
 subtitle = html.Div(
     children="Insight Data Engineering Rocks",
     style={"textAlign": "center", "color": colors["text"]}
@@ -46,8 +48,7 @@ intro = dcc.Markdown(children = markdown_text)
 # df = pd.read_sql("SELECT * FROM GitHubData", con=db_connection)
 
 # Define the components
-db_connection = sql.connect(host="ec2-35-161-183-67.us-west-2.compute.amazonaws.com", port="3306", database="insight", user="root", password="password")
-unique_languages = pd.read_sql("SELECT DISTINCT(language_name) language FROM GitHubData", db_connection)
+unique_languages = dal.get_unique_languages()
 language_dropdown = dcc.Dropdown(
     id = "language_dropdown",
     options = [{"label": l, "value": l} for l in unique_languages.language]
@@ -86,17 +87,6 @@ graph = dcc.Graph(
     id='package_graph'
 )
 
-package_table = table.DataTable(
-        rows=[{}],
-        row_selectable=True,
-        filterable=False,
-        sortable=False,
-        selected_row_indices=[],
-        id='package_table'
-    )
-
-
-
 app.layout = html.Div( #style = {"backgroundColor": colors["background"], "color": colors["text"]},
     children = [
         title,
@@ -120,8 +110,7 @@ app.layout = html.Div( #style = {"backgroundColor": colors["background"], "color
     Output("package_dropdown", "options"),
     [Input("language_dropdown", "value")])
 def language_dropdown(language):
-    db_connection = sql.connect(host = "ec2-35-161-183-67.us-west-2.compute.amazonaws.com", port = "3306", database = "insight", user = "root", password = "password")
-    unique_packages = pd.read_sql("SELECT DISTINCT(package_name) package FROM GitHubData WHERE language_name = '{}'".format(language), db_connection)
+    unique_packages = dal.get_packages_by_language(language)
     return [{"label": l, "value": l} for l in unique_packages.package]
 
 def generate_table(dataframe, max_rows=10):
@@ -140,28 +129,16 @@ def generate_table(dataframe, max_rows=10):
     [Input("language_dropdown", "value")],
     [State("begin_date", "date"), State("end_date", "date")])
 def update_package_table(language, begin_date, end_date):
-    db_connection = sql.connect(host="ec2-35-161-183-67.us-west-2.compute.amazonaws.com", port="3306", database="insight", user="root", password="password")
-    query = """
-        SELECT  package_name "Package",
-                SUM(usage_count) "Usage"
-            FROM GitHubData
-            WHERE language_name = '{}'
-                AND date BETWEEN '{}' AND '{}'
-            GROUP BY package_name
-            ORDER BY 2 DESC
-            LIMIT 10
-    """.format(language, begin_date, end_date)
-
-    package_data = pd.read_sql(query, db_connection)
-    db_connection.close()
+    package_data = dal.get_most_used_languages(language, begin_date, end_date)
     return generate_table(package_data)
+
 @app.callback(
     Output("package_graph", "figure"),
     [Input("language_dropdown", "value"), Input("package_dropdown", "value")],
     [State("begin_date", "date"), State("end_date", "date")])
 def update_graph(language, packages, begin_date, end_date):
-    if len(packages) == 0:
-        return  go.Figure(
+    if packages == None:
+        return go.Figure(
                 data=[],
                 layout=go.Layout(
                     title='Packages!!!',
@@ -173,36 +150,18 @@ def update_graph(language, packages, begin_date, end_date):
                     margin=go.Margin(l=40, r=0, t=40, b=30)
                 )
             )
-
-    db_connection = sql.connect(host="ec2-35-161-183-67.us-west-2.compute.amazonaws.com", port="3306", database="insight", user="root", password="password")
-    db_connection.sql_mode = [SQLMode.ANSI_QUOTES]
-    pivots = ",".join(["""SUM(CASE WHEN package_name = '{0}' THEN usage_count ELSE 0 END) "{0}" """.format(package) for package in packages])
-    in_clause = ",".join(["'{}'".format(package) for package in packages])
-
-    query = """
-        SELECT  date,
-                {}
-            FROM GitHubData
-            WHERE package_name IN ({})
-                AND date BETWEEN '{}' AND '{}'
-            GROUP BY date
-            ORDER BY date;
-    """.format(pivots, in_clause, begin_date, end_date)
-
-    package_data = pd.read_sql(query, db_connection)
-    db_connection.close()
-
+    package_data = dal.get_usage_by_import(language, packages, begin_date, end_date)
     colors = gen_colors(len(packages))
 
     def make_trace(df, package, rgb):
         x_date = df['date']
         y_package = df[package]
         return go.Trace(
-                x = x_date,
-                y = y_package,
-                name = package,
-                marker=go.Marker(color=rgb)
-                )
+            x = x_date,
+            y = y_package,
+            name = package,
+            marker = go.Marker(color = rgb)
+            )
 
     return go.Figure(
             data=[make_trace(package_data, package, colors[i]) for i, package in enumerate(packages)],
@@ -222,4 +181,4 @@ def gen_colors(n):
     return list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True, host="0.0.0.0")

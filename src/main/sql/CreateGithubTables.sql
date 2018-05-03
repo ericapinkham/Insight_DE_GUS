@@ -47,10 +47,11 @@ create table UserData(
     email varchar(255),
     login varchar(255)
 	)
-    ;
+;
     
     
-select * from UserData;
+select count(1) from UserData
+	where location is not null;
 
 select 	count(1),
 		count(distinct id)

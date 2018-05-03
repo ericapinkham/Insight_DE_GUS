@@ -2,6 +2,8 @@
 https://insights.stackoverflow.com/survey/2018/#most-loved-dreaded-and-wanted
 most loved means ""% of developers who are developing with the language or technology and have expressed interest in continuing to develop with it"
 
+also https://octoverse.github.com/
+
 Rust: .rs, .rlib
 Kotlin: .kt, .kts
 Python: .py, .pyc, .pyd, .pyo, .pyw, .pyz

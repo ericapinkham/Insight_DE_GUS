@@ -15,51 +15,60 @@ class CommitRecordTestSuite extends FunSuite {
 //  }
   
   test("Language Extraction 01") {
-    assert(extractLanguage("hello_world.py") === "python")
-    assert(extractLanguage("     hello_world.hs       ") === "haskell")
-    assert(extractLanguage("hello_world.scala\n") === "scala")
-    assert(extractLanguage("hello_world.java\r\n") === "java")
-    assert(extractLanguage("hello_world.js") === "javascript")
+    assert(extractLanguage("hello_world.py") === "Python")
+    assert(extractLanguage("     hello_world.hs       ") === "Haskell")
+    assert(extractLanguage("hello_world.scala\n") === "Scala")
+    assert(extractLanguage("hello_world.java\r\n") === "Java")
+    assert(extractLanguage("hello_world.js") === "JavaScript")
   }
   
-  test("Package Extraction 01") {
+  test("Python Packages") {
     // Python
     val pythonImports = "+from unittest import TestCase as TC, main\n+import time\n-import pandas"
-    assert(extractPackages("python", pythonImports).toSet === Set((1, "unittest"), (1, "time"), (-1, "pandas")))
-    
+    assert(extractPackages("Python", pythonImports).toSet === Set((1, "unittest"), (1, "time"), (-1, "pandas")))
+  }
+
+  test("Scala Packages") {
     // Scala
-    val scalaImports = """+      import org.apache.spark
-                         |       +import org.apache.spark.{SparkConf, SparkContext}
-                         |+import org.apache.spark.sql.SQLContext
-                         |-import       org.apache.spark.sql.SparkSession"""
-    assert(extractPackages("scala", scalaImports).toSet ===
+    val scalaImports =
+      """+      import org.apache.spark
+        |       +import org.apache.spark.{SparkConf, SparkContext}
+        |+import org.apache.spark.sql.SQLContext
+        |-import       org.apache.spark.sql.SparkSession"""
+    assert(extractPackages("Scala", scalaImports).toSet ===
       Set(
         (1, "org.apache.spark"),
         (1, "org.apache.spark.sql.SQLContext"),
         (-1, "org.apache.spark.sql.SparkSession")
       )
     )
-    
+  }
+
+  test("Java Packages") {
     // Java
-    val javaImports = """+import static java.awt.Color;
-                           |+import java.awt.*;
-                           |-import javax.swing.JOptionPane;"""
-    assert(extractPackages("java", javaImports).toSet ===
+    val javaImports =
+      """+import static java.awt.Color;
+        |+import java.awt.*;
+        |-import javax.swing.JOptionPane;"""
+    assert(extractPackages("Java", javaImports).toSet ===
       Set(
         (1, "java.awt.Color"),
         (1, "java.awt"),
         (-1, "javax.swing.JOptionPane")
       )
     )
-    
+  }
+
+  test("Haskell Packages") {
     // Haskell
-    val haskellImports = """+import Mod1
-                           |+import Mod2 (x,y)
-                           |-import qualified Mod3
-                           |-import qualified Mod4
-                           |+import Mod5 hiding (x,y)
-                           |+import qualified Mod6"""
-    assert(extractPackages("haskell", haskellImports).toSet ===
+    val haskellImports =
+      """+import Mod1
+        |+import Mod2 (x,y)
+        |-import qualified Mod3
+        |-import qualified Mod4
+        |+import Mod5 hiding (x,y)
+        |+import qualified Mod6"""
+    assert(extractPackages("Haskell", haskellImports).toSet ===
       Set(
         (1, "Mod1"),
         (1, "Mod2"),
@@ -69,5 +78,28 @@ class CommitRecordTestSuite extends FunSuite {
         (1, "Mod6")
       )
     )
+  }
+
+  test("Rust Packages") {
+    val rustImports =
+      """+use TrafficLight::*;
+        |+use APackage::{Red, Yellow};
+      """.stripMargin
+    assert(extractPackages("Rust", rustImports).toSet === Set((1, "TrafficLight"), (1, "APackage")))
+  }
+
+  test("JavaScript Imports") {
+    val javaScriptImports =
+      """+import defaultExport from "module-name1";
+        |+import * as name from "module-name2";
+        |+import { export } from "module-name3";
+        |+import { export as alias } from "module-name4";
+        |+import { export1 , export2 } from "module-name5";
+        |+import { export1 , export2 as alias2 , [...] } from "module-name6";
+        |+import defaultExport, { export [ , [...] ] } from "module-name7";
+        |+import defaultExport, * as name from "module-name8";
+        |+import "module-name9";
+      """.stripMargin
+    assert(extractPackages("JavaScript", javaScriptImports).toSet === (for (n <- 1 to 9) yield (1, s"module-name$n")).toSet)
   }
 }
