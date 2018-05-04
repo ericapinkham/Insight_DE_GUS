@@ -2,8 +2,8 @@ package Jobs
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.{SparkConf, SparkContext}
-import Jobs.Extractor.{RepoRecord, UserRecord}
 import Jobs.Extractor.CommitRecord.extractCommit
+import org.apache.spark.sql.functions.to_date
 
 object ExtractGitHubData extends MySQLConnection {
   /**
@@ -27,24 +27,19 @@ object ExtractGitHubData extends MySQLConnection {
 
     // Read text files into spark RDD, map to objects and convert to DF
 
-
+    val toDate = to_date($"commit_timestamp", "yyyy-MM-dd'T'hh:mm:ss'Z'")
     val commitsDf = sc.textFile(s"$dataDirectory/commits.json")
       .flatMap{s => extractCommit(s)}
       .toDF()
+      .withColumn("commit_timestamp", toDate)
 
 
-    val usersDf = sc.textFile(s"$dataDirectory/users.json")
-      .map(s => UserRecord(s))
-      .filter(_.id != 0)
-      .keyBy(_.id)
-      .reduceByKey{_ + _}
-      .toDF()
 
-//    val reposDf = sc.textFile(s"$dataDirectory/repos.json").map(s => RepoRecord(s)).toDF
 
-    val resultDf = commitsDf.join(sc.broadcast(usersDf).value, Seq("id"), "left_outer")
+    //    val reposDf = sc.textFile(s"$dataDirectory/repos.json").map(s => RepoRecord(s)).toDF
 
-    resultDf.write.parquet(s"$dataDirectory/github_data.parquet")
+//    val resultDf =
+//    resultDf.write.parquet(s"$dataDirectory/github_data.parquet")
 //    resultDf.show()
 //    val ts = to_timestamp($"commit_timestamp", "yyyy-MM-dd'T'hh:mm:ss'Z'") // for mapping timestamps so that MySQL can deal
 //    commits.withColumn("commit_timestamp", ts).write.mode(SaveMode.Append).jdbc(connectionString, "GitHubData", jdbcProperties)

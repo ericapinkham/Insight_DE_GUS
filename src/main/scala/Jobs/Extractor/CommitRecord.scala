@@ -4,6 +4,9 @@ import scala.util.matching.Regex
 import scala.util.parsing.json.JSON
 
 object CommitRecord extends Utils with Languages {
+  // If date's don't parse, use today's date
+  private lazy val today = new java.sql.Date(new java.util.Date().getTime)
+
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {
       case None => ""
@@ -25,6 +28,14 @@ object CommitRecord extends Utils with Languages {
     }
   }
 
+  def extractDate(dateTime: String): java.sql.Date = {
+    val datePattern = """(\d{4})-(\d{2})-(\d{2}).*""".r
+    dateTime match {
+      case datePattern(year, month, day) => new java.sql.Date(year.toInt, month.toInt, day.toInt)
+      case _ => today
+    }
+  }
+
   private def extract(rawJson: String): List[CommitRecord] = {
     case class FileInfo(fileName: String, language: String, status: String, packageName: String, packageUsage: Int)
     val jsonMap = JSON.parseFull(removeObjectId(rawJson))
@@ -33,7 +44,7 @@ object CommitRecord extends Utils with Languages {
 
     val committerMap = jsonMap.getOrElse("committer", Map[String, Any]()).asInstanceOf[Map[String, Any]]
     val id: Int = committerMap.getOrElse("id", null).asInstanceOf[Double].toInt
-    val date: String = committerMap.getOrElse("date", null).asInstanceOf[String]
+    val date: java.sql.Date = extractDate(committerMap.getOrElse("date", null).asInstanceOf[String])
     val email: String = committerMap.getOrElse("email", null).asInstanceOf[String]
     val message: String = committerMap.getOrElse("message", null).asInstanceOf[String]
 
@@ -56,4 +67,4 @@ object CommitRecord extends Utils with Languages {
   }
 }
 
-case class CommitRecord(id: Int, commit_timestamp: String, user_email: String, commit_message: String, file_name: String, language_name: String, package_name: String, usage_count: Int)
+case class CommitRecord(id: Int, date: java.sql.Date, user_email: String, commit_message: String, file_name: String, language_name: String, package_name: String, usage_count: Int)

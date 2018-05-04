@@ -1,5 +1,5 @@
 
-import Jobs.Extractor.CommitRecord.{extractLanguage, extractPackages}
+import Jobs.Extractor.CommitRecord.{extractLanguage, extractPackages, extractDate}
 import org.scalatest.FunSuite
 
 class CommitRecordTestSuite extends FunSuite {
@@ -101,5 +101,12 @@ class CommitRecordTestSuite extends FunSuite {
         |+import "module-name9";
       """.stripMargin
     assert(extractPackages("JavaScript", javaScriptImports).toSet === (for (n <- 1 to 9) yield (1, s"module-name$n")).toSet)
+  }
+
+
+  test("Date Extraction") {
+    assert(extractDate("2018-04-25T02:03:55Z") === new java.sql.Date(2018, 4, 25))
+    assert(extractDate("2018-04-25T02:01:49Z") === new java.sql.Date(2018, 4, 25))
+    assert(extractDate("2015-01-01T02:03:48Z") === new java.sql.Date(2015, 1, 1))
   }
 }

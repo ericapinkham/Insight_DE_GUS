@@ -15,8 +15,7 @@ import data_access_layer as dal
 # Set up the MySQL Connection
 
 # Here"s my cool App
-server = Flask(__name__
-)
+server = Flask(__name__)
 app = dash.Dash(__name__, server = server)
 
 colors = {

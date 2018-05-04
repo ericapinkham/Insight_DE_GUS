@@ -45,6 +45,6 @@ trait Languages {
       "Haskell" -> List("""import\s+(?!qualified)\s*([0-9a-zA-Z]+)""", """import\squalified\s([0-9a-zA-Z]+)"""), // Could probably do this with optional non-capture group
       "Java" -> List("""import\s+(?!static)\s*([0-9a-zA-Z\.]*[0-9a-zA-Z]+)""", """import\s+static\s+([0-9a-zA-Z\.]*[0-9a-zA-Z]+)"""),
       "Rust" -> List("""use\s+([a-zA-Z0-9]+)::.+?;"""),
-      "JavaScript" -> List("""import.*?\"(.*?)\";""")
+      "JavaScript" -> List("""import.*?(?:\"|\')(.*?)(?:\"|\')""")
     )
 }
