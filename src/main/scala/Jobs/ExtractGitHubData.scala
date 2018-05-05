@@ -4,7 +4,7 @@ import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import Jobs.Extractor.CommitRecord.extractCommit
 
-object ExtractGitHubData extends MySQLConnection {
+object ExtractGitHubData extends DBConnection {
   /**
     *
     * @param args: full file path

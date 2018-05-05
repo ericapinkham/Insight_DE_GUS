@@ -3,18 +3,18 @@ package Jobs
 /**
   * Store MySQL connection properties so that I don't have to do this all over the place
   */
-trait MySQLConnection {
+trait DBConnection {
   // MySQL settings
-  private val host: String = "ec2-35-161-183-67.us-west-2.compute.amazonaws.com"
-  private val port: Int = 3306
+  private val host: String = "ec2-52-36-220-17.us-west-2.compute.amazonaws.com"
+  private val port: Int = 26257
   private val database: String = "insight"
-  private val user: String = "root"
-  private val password: String = "password"
+  private val user: String = "maxroach"
+  private val password: String = ""
   
   // Build the inherited members
   final val connectionString = s"jdbc:mysql://$host:$port/$database?autoReconnect=true&useSSL=false"
   final val jdbcProperties = new java.util.Properties
-  jdbcProperties.setProperty("driver", "com.mysql.cj.jdbc.Driver")
+  jdbcProperties.setProperty("driver", "org.postgresql.Driver")
   jdbcProperties.setProperty("user", s"$user")
   jdbcProperties.setProperty("password", s"$password")
 }

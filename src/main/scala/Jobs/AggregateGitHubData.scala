@@ -4,7 +4,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{SparkSession, SaveMode}
 import org.apache.spark.sql.functions.to_date
 
-object AggregateGitHubData extends MySQLConnection {
+object AggregateGitHubData extends DBConnection {
   def main(args: Array[String]): Unit = {
     // Extract the arguments
     val dataDirectory: String = args match {
