@@ -60,4 +60,4 @@ object CommitRecord extends Utils with Languages {
   }
 }
 
-case class CommitRecord(commit_date: java.sql.Date, language_name: String, package_name: String, usage_count: Int)
+case class CommitRecord(commit_date: java.sql.Date, language_name: String, import_name: String, usage_count: Int)

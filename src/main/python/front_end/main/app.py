@@ -44,9 +44,6 @@ this is text explaining the project?
 """
 intro = dcc.Markdown(children = markdown_text)
 
-# Get a list of unique languages from MySQL. This should probably be precomputed
-# df = pd.read_sql("SELECT * FROM GitHubData", con = db_connection)
-
 # Define the components
 unique_languages = dal.get_unique_languages()
 language_dropdown = dcc.Dropdown(
@@ -144,7 +141,7 @@ def update_graph(language, packages, begin_date, end_date):
     colors = gen_colors(len(packages))
 
     def make_trace(df, package, rgb):
-        x_date = df['date']
+        x_date = df['commit_date']
         y_package = df[package]
         return go.Trace(
             x = x_date,

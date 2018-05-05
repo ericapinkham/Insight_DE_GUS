@@ -27,7 +27,7 @@ object ExtractGitHubData extends DBConnection {
     // Read text files into spark RDD, map to objects and convert to DF
     val commitsDf = spark.read.textFile(s"$dataDirectory/commits.json")
       .flatMap{s => extractCommit(s)}
-//      .groupBy("commit_date", "language_name", "package_name")
+//      .groupBy("commit_date", "language_name", "import_name")
 //      .sum("usage_count")
 //      .withColumnRenamed("sum(usage_count)", "usage_count")
 
