@@ -1,6 +1,6 @@
-name := "insight_data_engineering"
+name := "insight"
 
-version := "0.2"
+version := "0.3"
 
 scalaVersion := "2.11.8"
 
@@ -13,6 +13,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
   "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
+  "com.typesafe.play" %% "play-json" % "2.6.7",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "mysql" % "mysql-connector-java" % "6.0.5"
 )

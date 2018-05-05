@@ -48,8 +48,7 @@ create table UserData(
     login varchar(255)
 	)
 ;
-    
-    
+
 select count(1) from UserData
 	where location is not null;
 
@@ -60,3 +59,10 @@ select 	count(1),
 ;
 
 select count(1) from UserData where Location Is not null;
+
+CREATE TABLE ImportCounts (
+	commit_date DATE,
+    language_name VARCHAR(255),
+    package_name VARCHAR(255),
+    usage_count INT
+    );

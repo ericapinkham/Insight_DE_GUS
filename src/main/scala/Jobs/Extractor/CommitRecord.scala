@@ -1,10 +1,10 @@
 package Jobs.Extractor
 
 import scala.util.matching.Regex
-import scala.util.parsing.json.JSON
+import play.api.libs.json.{Json, JsValue}
 
 object CommitRecord extends Utils with Languages {
-  // If date's don't parse, use today's date
+  // If dates don't parse, use today's date
   private lazy val today = new java.sql.Date(new java.util.Date().getTime)
 
   def extractLanguage(filename: String): String = {
@@ -17,14 +17,16 @@ object CommitRecord extends Utils with Languages {
   def extractPackages(language: String, patch: String): List[(Int, String)] = {
     def prepPattern(pattern: String): Regex = ("""(\+|\-)\s*""" + pattern).r
     languagePatterns.getOrElse(language, List[String]())
-      .flatMap(prepPattern(_).findAllMatchIn(patch).map(m => (if (m.group(1) == "+") 1 else if (m.group(1) == "-") -1 else 0, m.group(2))))
+      .flatMap(prepPattern(_)
+      .findAllMatchIn(patch)
+      .map(m => (if (m.group(1) == "+") 1 else if (m.group(1) == "-") -1 else 0, m.group(2))))
   }
 
   def extractCommit(rawJson: String): List[CommitRecord] = {
     try {
       extract(rawJson)
-    } catch {
-      case _ => List[CommitRecord]()
+    } catch { // If we fail to parse a record, we don't want everything to stop.
+      case _: Throwable => List[CommitRecord]()
     }
   }
 
@@ -37,34 +39,25 @@ object CommitRecord extends Utils with Languages {
   }
 
   private def extract(rawJson: String): List[CommitRecord] = {
-    case class FileInfo(fileName: String, language: String, status: String, packageName: String, packageUsage: Int)
-    val jsonMap = JSON.parseFull(removeObjectId(rawJson))
-      .getOrElse(Map[String, Any]())
-      .asInstanceOf[Map[String, Any]]
+    val jsonCommit = Json.parse(removeObjectId(rawJson))
 
-    val committerMap = jsonMap.getOrElse("committer", Map[String, Any]()).asInstanceOf[Map[String, Any]]
-    val id: Int = committerMap.getOrElse("id", null).asInstanceOf[Double].toInt
-    val date: java.sql.Date = extractDate(committerMap.getOrElse("date", null).asInstanceOf[String])
-    val email: String = committerMap.getOrElse("email", null).asInstanceOf[String]
-    val message: String = committerMap.getOrElse("message", null).asInstanceOf[String]
+    val date = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null))
 
-    val fileMaps = jsonMap.getOrElse("files", List[Map[String, Any]]()).asInstanceOf[List[Map[String, Any]]]
-    val fileTuples = fileMaps.map{f => (
-        f.getOrElse("filename", null).asInstanceOf[String],
-        extractLanguage(f.getOrElse("filename", null).asInstanceOf[String]),
-        f.getOrElse("status", null).asInstanceOf[String],
-        f.getOrElse("patch", null).asInstanceOf[String]
-      )
-    }
+    val files = (jsonCommit \ "files").validate[List[JsValue]].getOrElse(List[JsValue]()) //.getOrElse(List[Map[String, Any]]())
+    val fileTuples = for (file <- files) yield (
+      extractLanguage((file \ "filename").validate[String].getOrElse("")),
+      (file \ "patch").validate[String].getOrElse("")
+    )
 
+    // Extract all of the imports and flatten
     fileTuples.flatMap{
-      case (filename, language, status, patch) =>
+      case (language, patch) =>
         extractPackages(language, patch).map{
           case (count, packageName) =>
-            new CommitRecord(id, date, email, message, filename, language, packageName, count)
+            new CommitRecord(date, language, packageName, count)
       }
     }
   }
 }
 
-case class CommitRecord(id: Int, date: java.sql.Date, user_email: String, commit_message: String, file_name: String, language_name: String, package_name: String, usage_count: Int)
+case class CommitRecord(commit_date: java.sql.Date, language_name: String, package_name: String, usage_count: Int)

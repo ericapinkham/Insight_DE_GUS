@@ -14,7 +14,7 @@ trait MySQLConnection {
   // Build the inherited members
   final val connectionString = s"jdbc:mysql://$host:$port/$database?autoReconnect=true&useSSL=false"
   final val jdbcProperties = new java.util.Properties
-  jdbcProperties.setProperty("driver", "com.mysql.jdbc.Driver")
+  jdbcProperties.setProperty("driver", "com.mysql.cj.jdbc.Driver")
   jdbcProperties.setProperty("user", s"$user")
   jdbcProperties.setProperty("password", s"$password")
 }
