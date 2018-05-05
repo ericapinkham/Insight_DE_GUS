@@ -1,7 +1,7 @@
 package Jobs
 
 /**
-  * Store MySQL connection properties so that I don't have to do this all over the place
+  * Store CockroachDB connection properties so that I don't have to do this all over the place
   */
 trait DBConnection {
   // MySQL settings
