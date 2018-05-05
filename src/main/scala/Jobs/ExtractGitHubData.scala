@@ -32,7 +32,7 @@ object ExtractGitHubData extends DBConnection {
 //      .withColumnRenamed("sum(usage_count)", "usage_count")
 
     // Write the DataFrame to DB
-    commitsDf.write.mode(SaveMode.Append).jdbc(connectionString, "ImportCounts", jdbcProperties)
+    commitsDf.write.mode(SaveMode.Append).jdbc(connectionString, "github_commits", jdbcProperties)
   }
 }
 

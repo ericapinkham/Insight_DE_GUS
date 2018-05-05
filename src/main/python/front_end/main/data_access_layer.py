@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import psycopg2
 import pandas as pd
 
@@ -12,7 +13,7 @@ def get_most_used_languages(language, begin_date, end_date):
     query = """
         SELECT  import_name "Import",
                 SUM(usage_count) "Usage"
-            FROM GitHubData
+            FROM github_commits_test
             WHERE language_name = '{}'
                 AND commit_date BETWEEN '{}' AND '{}'
             GROUP BY import_name
@@ -28,7 +29,7 @@ def get_usage_by_import(language, packages, begin_date, end_date):
     query = """
         SELECT  commit_date,
                 {}
-            FROM GitHubData
+            FROM github_commits_test
             WHERE import_name IN ({})
                 AND commit_date BETWEEN '{}' AND '{}'
             GROUP BY commit_date
@@ -39,7 +40,7 @@ def get_usage_by_import(language, packages, begin_date, end_date):
 def get_packages_by_language(language):
     query = """
         SELECT  DISTINCT(import_name) package
-                FROM GitHubData
+                FROM github_commits_test
             WHERE language_name = '{}'
         """.format(language)
     return fetch(query)
@@ -47,6 +48,6 @@ def get_packages_by_language(language):
 def get_unique_languages():
     query = """
         SELECT  DISTINCT(language_name) language
-            FROM GitHubData
+            FROM github_commits_test
         """
     return fetch(query)

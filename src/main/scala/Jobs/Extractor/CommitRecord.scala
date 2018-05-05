@@ -1,11 +1,14 @@
 package Jobs.Extractor
 
+import java.text.SimpleDateFormat
+
 import scala.util.matching.Regex
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsValue, Json}
 
 object CommitRecord extends Utils with Languages {
   // If dates don't parse, use today's date
-  private lazy val today = new java.sql.Date(new java.util.Date().getTime)
+  private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+  private lazy val today = dateFormat.format(new java.util.Date())
 
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {
@@ -30,10 +33,11 @@ object CommitRecord extends Utils with Languages {
     }
   }
 
-  def extractDate(dateTime: String): java.sql.Date = {
-    val datePattern = """(\d{4})-(\d{2})-(\d{2}).*""".r
+  def extractDate(dateTime: String): String = {
+    val datePattern = """(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}Z""".r
+    
     dateTime match {
-      case datePattern(year, month, day) => new java.sql.Date(year.toInt, month.toInt, day.toInt)
+      case datePattern(dateString) => dateString
       case _ => today
     }
   }
@@ -60,4 +64,4 @@ object CommitRecord extends Utils with Languages {
   }
 }
 
-case class CommitRecord(commit_date: java.sql.Date, language_name: String, import_name: String, usage_count: Int)
+case class CommitRecord(commit_date: String, language_name: String, import_name: String, usage_count: Int)

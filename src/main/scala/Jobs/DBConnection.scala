@@ -12,7 +12,7 @@ trait DBConnection {
   private val password: String = ""
   
   // Build the inherited members
-  final val connectionString = s"jdbc:mysql://$host:$port/$database?autoReconnect=true&useSSL=false"
+  final val connectionString = s"jdbc:postgresql://$host:$port/$database?sslmode=disable"
   final val jdbcProperties = new java.util.Properties
   jdbcProperties.setProperty("driver", "org.postgresql.Driver")
   jdbcProperties.setProperty("user", s"$user")

@@ -105,8 +105,8 @@ class CommitRecordTestSuite extends FunSuite {
 
 
   test("Date Extraction") {
-    assert(extractDate("2018-04-25T02:03:55Z") === new java.sql.Date(2018, 4, 25))
-    assert(extractDate("2018-04-25T02:01:49Z") === new java.sql.Date(2018, 4, 25))
-    assert(extractDate("2015-01-01T02:03:48Z") === new java.sql.Date(2015, 1, 1))
+    assert(extractDate("2018-04-25T02:03:55Z") === "2018-04-25")
+    assert(extractDate("2018-04-25T02:01:49Z") === "2018-04-25")
+    assert(extractDate("2015-01-01T02:03:48Z") === "2015-01-01")
   }
 }
