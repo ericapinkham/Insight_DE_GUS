@@ -6,7 +6,7 @@ import scala.util.matching.Regex
 import play.api.libs.json.{JsValue, Json}
 import scala.math.Ordered.orderingToOrdered
 
-object CommitRecord extends Utils with Languages {
+object CommitRecord extends Languages {
   // If dates don't parse, use today's date
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = dateFormat.format(new java.util.Date())
@@ -44,6 +44,8 @@ object CommitRecord extends Utils with Languages {
   }
 
   private def extract(rawJson: String): List[CommitRecord] = {
+    // Remove the MongoDB ObjectID
+    def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
     val jsonCommit = Json.parse(removeObjectId(rawJson))
 
     val date = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null))
@@ -66,5 +68,6 @@ object CommitRecord extends Utils with Languages {
 }
 
 case class CommitRecord(commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
+  // Define an ordering so that Spark can repartition appropriately
   def compare(that: CommitRecord): Int = (this.commit_date, this.language_name, this.import_name) compare (that.commit_date, that.language_name, import_name)
 }
