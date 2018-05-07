@@ -24,7 +24,11 @@ class CommitRecordTestSuite extends FunSuite {
   
   test("Python Packages") {
     // Python
-    val pythonImports = "+from unittest import TestCase as TC, main\n+import time\n-import pandas"
+    val pythonImports =
+      """+from unittest import TestCase as TC, main
+        |+import time
+        |-import pandas
+      """.stripMargin
     assert(extractPackages("Python", pythonImports).toSet === Set((1, "unittest"), (1, "time"), (-1, "pandas")))
   }
 

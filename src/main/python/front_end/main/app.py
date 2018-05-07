@@ -5,7 +5,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 import pandas as pd
-from datetime import date as dt
+from datetime import date as dt, timedelta, datetime
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output, State
 import colorsys
@@ -14,64 +14,50 @@ import data_access_layer as dal
 
 # Set up the MySQL Connection
 
+colors = {
+    "blue": "#4285f4",
+    "white": "#ffffff"
+}
+
 # Here"s my cool App
 server = Flask(__name__)
 app = dash.Dash(__name__, server = server)
 
-colors = {
-    "background": "#111111",
-    "text": "#7FDBFF"
-}
-
 title = html.H1(
-    children="Package Tracker",
-    style={"textAlign": "center", "color": colors["text"]}
+    children="GitHub Import Analytics",
+    style={"textAlign": "center", "color": colors["white"]}
     )
 
 subtitle = html.Div(
     children="Insight Data Engineering Rocks",
-    style={"textAlign": "center", "color": colors["text"]}
+    style={"textAlign": "center", "color": colors["white"]}
     )
-
-markdown_text = """
-# Text Text Text
-
-this is text explaining the project?
-
-* whatever
-* whatever 1
-  * sub-whatever
-"""
-intro = dcc.Markdown(children = markdown_text)
 
 # Define the components
 unique_languages = dal.get_unique_languages()
 language_dropdown = dcc.Dropdown(
     id = "language_dropdown",
-    options = [{"label": l, "value": l} for l in unique_languages.language]
+    options = [{"label": l, "value": l} for l in unique_languages.language],
+    placeholder = "Select a language"
 )
 
 package_dropdown = dcc.Dropdown(
     id = "package_dropdown",
     options = [],
-    multi = True
+    multi = True,
+    placeholder="Select an import",
 )
 
-begin_date = dcc.DatePickerSingle(
-    id="begin_date",
-    date = dt(2018, 1, 1)
-)
-
-end_date = dcc.DatePickerSingle(
-    id="end_date",
-    date = dt(2018, 5, 24)
+eval_date = dcc.DatePickerSingle(
+    id = "eval_date",
+    date = dt(2018, 5, 3)
 )
 
 graph = dcc.Graph(
     figure = go.Figure(
-        data=[],
+        data = [],
         layout = go.Layout(
-            title='Packages!!!',
+            title = 'Imports by Date',
             showlegend = True,
             legend = go.Legend(
                 x = 0,
@@ -80,27 +66,43 @@ graph = dcc.Graph(
             margin = go.Margin(l = 40, r = 0, t = 40, b = 30)
         )
     ),
-    style={'height': 300},
+    style={'height': 500},
     id='package_graph'
 )
 
-app.layout = html.Div( #style = {"backgroundColor": colors["background"], "color": colors["text"]},
+package_summary_bar = dcc.Graph(
+    figure = go.Figure(
+            data = [],
+            layout = go.Layout(
+                title = 'Daily Import Summary',
+            )
+        ),
+    style = {'height': 500},
+    id = 'package_summary_bar'
+)
+
+app.layout = html.Div(style = {"backgroundColor": colors["blue"], "color": colors["white"]},
     children = [
         title,
         subtitle,
-        intro,
-        html.Label("Language"),
+        html.Div(style = {'color': colors['blue']},
+        children = [
+        html.Label("Language", style = {'color': colors['white']}),
         language_dropdown,
-        html.Label("Dates"),
-        html.Div(style = {"columnCount": 2},
-            children = [
-                begin_date,
-                end_date
-            ]),
-        html.Label("Package"),
+        html.Label("Package", style = {'color': colors['white']}),
         package_dropdown,
-        graph,
-        html.Div(id='table_container')
+        html.Label("Evaluation Date", style = {'color': colors['white']}),
+        eval_date,
+        ]),
+        html.Div(style = {'columnCount': 2},
+            children = [
+            html.Div(children = [
+                package_summary_bar
+            ]),
+            html.Div(
+                children = [graph]
+            )
+        ])
 ])
 
 @app.callback(
@@ -108,36 +110,37 @@ app.layout = html.Div( #style = {"backgroundColor": colors["background"], "color
     [Input("language_dropdown", "value")])
 def language_dropdown(language):
     unique_packages = dal.get_packages_by_language(language)
-    return [{"label": l, "value": l} for l in unique_packages.package]
-
-def generate_table(dataframe, max_rows = 10):
-    return html.Table(
-        # Header
-        [html.Tr([html.Th(col) for col in dataframe.columns])] +
-
-        # Body
-        [html.Tr([
-            html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
-        ]) for i in range(min(len(dataframe), max_rows))]
-    )
+    return [{"label": l, "value": l} for l in unique_packages.import_name]
 
 @app.callback(
-    Output("table_container", "children"),
+    Output("package_summary_bar", "figure"),
     [Input("language_dropdown", "value")],
-    [State("begin_date", "date"), State("end_date", "date")])
-def update_package_table(language, begin_date, end_date):
-    package_data = dal.get_most_used_languages(language, begin_date, end_date)
-    return generate_table(package_data)
+    [State("eval_date", "date")])
+def update_summary_bar(language, eval_date):
+    package_data = dal.get_most_used_languages(language, eval_date)
+    return go.Figure(
+            data = [go.Bar(
+                x = package_data['usage_count'][::-1],
+                y = package_data['import_name'][::-1],
+                name = 'Imports',
+                orientation = 'h'
+                # marker = go.Marker(color = rgb)
+                )],
+            layout = go.Layout(
+                title = 'Daily Import Summary',
+            )
+        )
+
 
 @app.callback(
     Output("package_graph", "figure"),
     [Input("language_dropdown", "value"), Input("package_dropdown", "value")],
-    [State("begin_date", "date"), State("end_date", "date")])
-def update_graph(language, packages, begin_date, end_date):
+    [State("eval_date", "date")])
+def update_graph(language, packages, eval_date):
     if packages == None:
         return None
 
-    package_data = dal.get_usage_by_import(language, packages, begin_date, end_date)
+    package_data = dal.get_usage_by_import(language, packages, datetime.strptime(eval_date,'%Y-%m-%d') - timedelta(weeks = 52), eval_date)
     colors = gen_colors(len(packages))
 
     def make_trace(df, package, rgb):
@@ -152,7 +155,7 @@ def update_graph(language, packages, begin_date, end_date):
     return go.Figure(
             data=[make_trace(package_data, package, colors[i]) for i, package in enumerate(packages)],
             layout = go.Layout(
-                title='Packages!!!',
+                title='Imports over Time',
                 showlegend = True,
                 legend = go.Legend(x = 0, y = 1.0),
                 margin = go.Margin(l = 40, r = 0, t = 40, b = 30)

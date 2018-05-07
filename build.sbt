@@ -15,7 +15,6 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
   "com.typesafe.play" %% "play-json" % "2.6.7",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  // "mysql" % "mysql-connector-java" % "6.0.5",
   "org.postgresql" % "postgresql" % "9.4.1208"
 )
 //postgresql-9.4.1208

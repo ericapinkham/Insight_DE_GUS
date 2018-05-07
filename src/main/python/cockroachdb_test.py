@@ -9,7 +9,7 @@ connection = psycopg2.connect(database='insight', user='maxroach', host='ec2-52-
 
 
 query = """
-SELECT * FROM test;
+SELECT * FROM imports where language_name = 'JavaScript';
 """
 
 df = pd.read_sql(query, connection)
