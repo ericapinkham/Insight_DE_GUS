@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 
 import scala.util.matching.Regex
 import play.api.libs.json.{JsValue, Json}
+import scala.math.Ordered.orderingToOrdered
 
 object CommitRecord extends Utils with Languages {
   // If dates don't parse, use today's date
@@ -64,4 +65,6 @@ object CommitRecord extends Utils with Languages {
   }
 }
 
-case class CommitRecord(commit_date: String, language_name: String, import_name: String, usage_count: Int)
+case class CommitRecord(commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
+  def compare(that: CommitRecord): Int = (this.commit_date, this.language_name, this.import_name) compare (that.commit_date, that.language_name, import_name)
+}

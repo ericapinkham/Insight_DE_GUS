@@ -1,5 +1,6 @@
 package Jobs
 
+import Jobs.Extractor.CommitRecord
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import Jobs.Extractor.CommitRecord.extractCommit
@@ -25,11 +26,13 @@ object ExtractGitHubData extends DBConnection {
     import spark.implicits._
 
     // Read text files into spark RDD, map to objects and convert to DF
-    val commitsDf = spark.read.textFile(s"$dataDirectory/commits.json")
+    val commitsDf = sc.textFile(s"$dataDirectory/commits.json")
       .flatMap{s => extractCommit(s)}
-//      .groupBy("commit_date", "language_name", "import_name")
-//      .sum("usage_count")
-//      .withColumnRenamed("sum(usage_count)", "usage_count")
+      .repartition(500)(Ordering[CommitRecord])
+      .toDF()
+      .groupBy("commit_date", "language_name", "import_name")
+      .sum("usage_count")
+      .withColumnRenamed("sum(usage_count)", "usage_count")
 
     // Write the DataFrame to DB
     commitsDf.write.mode(SaveMode.Append).jdbc(connectionString, "github_commits", jdbcProperties)
