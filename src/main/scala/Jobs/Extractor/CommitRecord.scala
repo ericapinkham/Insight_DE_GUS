@@ -1,15 +1,10 @@
 package Jobs.Extractor
 
-import java.text.SimpleDateFormat
-
 import scala.util.matching.Regex
 import play.api.libs.json.{JsValue, Json}
 import scala.math.Ordered.orderingToOrdered
 
 object CommitRecord extends Languages {
-  // If dates don't parse, use today's date
-  private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
-  private lazy val today = "2018-05-03" //dateFormat.format(new java.util.Date())
 
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {
@@ -26,29 +21,29 @@ object CommitRecord extends Languages {
       .map(m => (if (m.group(1) == "+") 1 else if (m.group(1) == "-") -1 else 0, m.group(2))))
   }
 
-  def extractCommit(rawJson: String): List[CommitRecord] = {
+  def extractCommit(rawJson: String, date: String): List[CommitRecord] = {
     try {
-      extract(rawJson)
+      extract(rawJson, date)
     } catch { // If we fail to parse a record, we don't want everything to stop.
       case _: Throwable => List[CommitRecord]()
     }
   }
 
-  def extractDate(dateTime: String): String = {
+  def extractDate(dateTime: String, default: String): String = {
     val datePattern = """(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}Z""".r
     
     dateTime match {
       case datePattern(dateString) => dateString
-      case _ => today
+      case _ => default
     }
   }
 
-  private def extract(rawJson: String): List[CommitRecord] = {
+  private def extract(rawJson: String, date: String): List[CommitRecord] = {
     // Remove the MongoDB ObjectID
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
     val jsonCommit = Json.parse(removeObjectId(rawJson))
 
-    val date = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null))
+    val date = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null), date)
 
     val files = (jsonCommit \ "files").validate[List[JsValue]].getOrElse(List[JsValue]()) //.getOrElse(List[Map[String, Any]]())
     val fileTuples = for (file <- files) yield (

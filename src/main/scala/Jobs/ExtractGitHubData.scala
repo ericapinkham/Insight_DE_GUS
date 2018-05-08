@@ -11,7 +11,7 @@ object ExtractGitHubData extends DBConnection {
     */
   def main(args: Array[String]): Unit = {
     // Extract the arguments
-    val dataDirectory: String = args match {
+    val dataFile: String = args match {
       case Array(dir) => dir
       case _ => throw new Error("Invalid arguments passed")
     }
@@ -28,8 +28,8 @@ object ExtractGitHubData extends DBConnection {
     import spark.implicits._
 
     // Read text files into spark RDD, map to objects and convert to DF
-    val commitsDf = sc.textFile(s"$dataDirectory/commits.json")
-      .flatMap{s => extractCommit(s)}
+    val commitsDf = sc.textFile(s"$dataFile")
+      .flatMap{s => extractCommit(s, today)}
       .repartition(500)(Ordering[CommitRecord])
       .toDF()
       .groupBy("commit_date", "language_name", "import_name")

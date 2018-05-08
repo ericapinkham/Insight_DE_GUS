@@ -1,12 +1,16 @@
-import org.apache.spark.{RangePartitioner, SparkConf, SparkContext}
-import org.apache.spark.sql.SparkSession
+import java.text.SimpleDateFormat
 
-// setup the spark context
-val conf = new SparkConf().setAppName("Parsing GitHub Commits")
-val sc = new SparkContext(conf)
+import java.util.Calendar
 
-// SparkSQL
-val spark = SparkSession.builder().getOrCreate()
+val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
 
+val currentDate: java.util.Date = new java.util.Date()
+System.out.println(dateFormat.format(currentDate))
 
-val a = new RangePartitioner(50, sc.parallelize((1 to 100).toSeq.map{case x => (x.toString, x)}))
+// convert date to calendar
+val c: Calendar = Calendar.getInstance
+
+//
+//val today = dateFormat.format()
+
+//today
