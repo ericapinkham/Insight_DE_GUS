@@ -9,7 +9,7 @@ import scala.math.Ordered.orderingToOrdered
 object CommitRecord extends Languages {
   // If dates don't parse, use today's date
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
-  private lazy val today = dateFormat.format(new java.util.Date())
+  private lazy val today = "2018-05-03" //dateFormat.format(new java.util.Date())
 
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {

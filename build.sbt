@@ -1,6 +1,6 @@
 name := "insight"
 
-version := "0.3"
+version := "0.4"
 
 scalaVersion := "2.11.8"
 
@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "org.postgresql" % "postgresql" % "9.4.1208"
 )
-//postgresql-9.4.1208
+
 // Exclude jars in assembly
 assemblyExcludedJars in assembly := {
   val cp = (fullClasspath in assembly).value
