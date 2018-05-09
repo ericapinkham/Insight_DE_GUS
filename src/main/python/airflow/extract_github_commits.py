@@ -4,7 +4,6 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.sensors import HttpSensor
-from airflow.operators.spark_submit_operator import SparkSubmitOperator
 import psycopg2
 from datetime import datetime, timedelta
 
