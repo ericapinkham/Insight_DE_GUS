@@ -109,8 +109,9 @@ class CommitRecordTestSuite extends FunSuite {
 
 
   test("Date Extraction") {
-    assert(extractDate("2018-04-25T02:03:55Z") === "2018-04-25")
-    assert(extractDate("2018-04-25T02:01:49Z") === "2018-04-25")
-    assert(extractDate("2015-01-01T02:03:48Z") === "2015-01-01")
+    assert(extractDate("2018-04-25T02:03:55Z", "2018-01-01") === "2018-04-25")
+    assert(extractDate("2018-04-25T02:01:49Z", "2018-01-01") === "2018-04-25")
+    assert(extractDate("2015-01-01T02:03:48Z", "2018-01-01") === "2015-01-01")
+    assert(extractDate("MALFORMED", "2018-01-01") === "2018-01-01")
   }
 }

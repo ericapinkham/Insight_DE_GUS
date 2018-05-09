@@ -14,7 +14,7 @@ def get_most_used_languages(language, date):
         WITH import_summary AS (
             SELECT  *,
                     ROW_NUMBER() OVER (PARTITION BY language_name ORDER BY usage_count DESC) AS RowNumber
-                FROM github_commits
+                FROM commits
                 WHERE language_name = '{}'
                     AND commit_date = '{}'
             )
@@ -34,7 +34,7 @@ def get_usage_by_import(language, packages, begin_date, end_date):
     query = """
         SELECT  commit_date,
                 {}
-            FROM github_commits
+            FROM commits
             WHERE import_name IN ({})
                 AND commit_date BETWEEN '{}' AND '{}'
             GROUP BY commit_date
@@ -47,12 +47,13 @@ def get_packages_by_language(language):
         SELECT  import_name
                 FROM imports
             WHERE language_name = '{}'
+            ORDER BY import_name
         """.format(language)
     return fetch(query)
 
 def get_unique_languages():
     query = """
         SELECT  DISTINCT(language_name) language
-            FROM github_commits
+            FROM imports
         """
     return fetch(query)

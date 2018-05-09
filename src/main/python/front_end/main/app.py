@@ -50,7 +50,7 @@ package_dropdown = dcc.Dropdown(
 
 eval_date = dcc.DatePickerSingle(
     id = "eval_date",
-    date = dt(2018, 5, 3)
+    date = dt(2018, 5, 7)
 )
 
 graph = dcc.Graph(

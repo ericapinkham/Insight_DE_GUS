@@ -38,12 +38,12 @@ object CommitRecord extends Languages {
     }
   }
 
-  private def extract(rawJson: String, date: String): List[CommitRecord] = {
+  private def extract(rawJson: String, defaultDate: String): List[CommitRecord] = {
     // Remove the MongoDB ObjectID
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
     val jsonCommit = Json.parse(removeObjectId(rawJson))
 
-    val date = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null), date)
+    val commitDate = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null), defaultDate)
 
     val files = (jsonCommit \ "files").validate[List[JsValue]].getOrElse(List[JsValue]()) //.getOrElse(List[Map[String, Any]]())
     val fileTuples = for (file <- files) yield (
@@ -56,13 +56,13 @@ object CommitRecord extends Languages {
       case (language, patch) =>
         extractPackages(language, patch).map{
           case (count, packageName) =>
-            new CommitRecord(date, language, packageName, count)
+            new CommitRecord(defaultDate, commitDate, language, packageName, count)
       }
     }
   }
 }
 
-case class CommitRecord(commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
+case class CommitRecord(received_date: String, commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
   // Define an ordering so that Spark can repartition appropriately
   def compare(that: CommitRecord): Int = (this.commit_date, this.language_name, this.import_name) compare (that.commit_date, that.language_name, import_name)
 }
