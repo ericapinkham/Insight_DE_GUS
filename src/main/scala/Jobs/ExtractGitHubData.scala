@@ -5,10 +5,11 @@ import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import Jobs.Extractor.CommitRecord.extractCommit
 
+/**
+  * Run the spark job
+  */
 object ExtractGitHubData extends DBConnection {
-  /**
-    * @param args: full file path
-    */
+
   def main(args: Array[String]): Unit = {
     // Extract the arguments
     val loadDate: String = args match {

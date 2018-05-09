@@ -4,8 +4,10 @@ import scala.util.matching.Regex
 import play.api.libs.json.{JsValue, Json}
 import scala.math.Ordered.orderingToOrdered
 
+/**
+  * Commit record factory object
+  */
 object CommitRecord extends Languages {
-
   def extractLanguage(filename: String): String = {
     """\.([a-zA-Z0-9]+)""".r.findFirstMatchIn(filename.trim) match {
       case None => ""
@@ -62,6 +64,14 @@ object CommitRecord extends Languages {
   }
 }
 
+/**
+  * Case class to store extracted commits
+  * @param received_date
+  * @param commit_date
+  * @param language_name
+  * @param import_name
+  * @param usage_count
+  */
 case class CommitRecord(received_date: String, commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
   // Define an ordering so that Spark can repartition appropriately
   def compare(that: CommitRecord): Int = (this.commit_date, this.language_name, this.import_name) compare (that.commit_date, that.language_name, import_name)
