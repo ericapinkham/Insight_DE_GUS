@@ -43,6 +43,10 @@ object CommitRecord extends Languages {
   private def extract(rawJson: String, defaultDate: String): List[CommitRecord] = {
     // Remove the MongoDB ObjectID
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
+
+    // Truncate fields for SQL
+    def truncate(n: Int)(s: String): String = s.substring(0, Math.min(s.length, n))
+
     val jsonCommit = Json.parse(removeObjectId(rawJson))
 
     val commitDate = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null), defaultDate)
@@ -58,7 +62,7 @@ object CommitRecord extends Languages {
       case (language, patch) =>
         extractPackages(language, patch).map{
           case (count, packageName) =>
-            new CommitRecord(defaultDate, commitDate, language, packageName, count)
+            CommitRecord(defaultDate, commitDate, truncate(64)(language), truncate(1024)(packageName), count)
       }
     }
   }
