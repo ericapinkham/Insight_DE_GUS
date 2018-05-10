@@ -9,7 +9,10 @@ import Jobs.Extractor.CommitRecord.extractCommit
   * Run the spark job
   */
 object ExtractGitHubData extends DBConnection {
-
+  /**
+    * The job spark will run
+    * @param args the date in YYYY-MM-DD format
+    */
   def main(args: Array[String]): Unit = {
     // Extract the arguments
     val loadDate: String = args match {
