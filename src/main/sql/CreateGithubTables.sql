@@ -35,26 +35,59 @@ INSERT INTO commits
 		ON CONFLICT (commit_date, language_name, import_name) DO UPDATE SET usage_count = commits.usage_count + excluded.usage_count
 ;
 
-UPDATE c
-	SET c.usage_count = c.usage_count + r.usage_count
-	FROM commits c
-	INNER JOIN received_commits r
-		ON r.received_date = 'date'
-		AND c.commit_date = r.commit_date
-		AND c.language_name = r.language_name
-		AND c.import_name = r.import_name
-	;
+CREATE TABLE daily_import_summary (
+	summary_date DATE,
+	language_name STRING(64),
+	import_name	STRING(1024),
+	usage_count INT,
+	PRIMARY KEY(summary_date, language_name, import_name)
+)
+;
 
--- Insert new records into commits
-INSERT INTO commits
-	SELECT r.commit_date,
-		r.language_name,
-		r.import_name,
-		r.usage_count
-		FROM received_commits r
-		LEFT JOIN commits c
-			ON c.commit_date = r.commit_date
-			AND c.language_name = r.language_name
-			AND c.import_name = r.import_name
-		WHERE r.received_date = 'date'
-	;
+WITH import_summary AS (
+	SELECT	commit_date,
+			language_name,
+			import_name,
+			usage_count,
+			ROW_NUMBER() OVER (PARTITION BY language_name ORDER BY usage_count DESC) AS row_number
+		FROM commits
+		WHERE commit_date = '2018-05-07'
+	)
+UPSERT INTO daily_import_summary (
+	summary_date,
+	language_name,
+	import_name,
+	usage_count
+)
+SELECT  commit_date,
+		language_name,
+		import_name,
+		usage_count
+	FROM import_summary
+	WHERE row_number <= 10
+	ORDER BY usage_count DESC
+;
+
+CREATE TABLE daily_language_totals (
+	language_name STRING(64),
+	commit_date DATE,
+	total_daily_usage INT,
+	PRIMARY KEY (language_name, commit_date)
+)
+;
+
+UPSERT INTO daily_language_totals (
+	language_name,
+	commit_date,
+	total_daily_usage
+)
+SELECT language_name,
+		commit_date,
+		CAST(SUM(usage_count) AS INT) AS total_daily_usage
+	FROM received_commits
+	WHERE received_date = '2018-05-07'
+	GROUP BY commit_date,
+		language_name
+;
+
+CREATE TABLE _change

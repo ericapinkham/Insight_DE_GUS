@@ -4,18 +4,19 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.sensors import HttpSensor
-import psycopg2
+from airflow.operators.postgres_operator import PostgresOperator
 from datetime import datetime, timedelta
 
 default_args = {
     'owner': 'eric',
-    'depends_on_past': True,
-    'start_date': datetime(2018, 5, 1),
+    'depends_on_past': False,
+    'start_date': datetime(2017, 4, 1),
     'email': ['eric.a.pinkham+airflow@gmail.com'],
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'retry_delay': timedelta(minutes = 5)
+    # 'concurrency': 4
 }
 
 dag = DAG('extract_github_commits', default_args = default_args, schedule_interval = '@daily')
@@ -67,49 +68,86 @@ spark-submit \
   --class Jobs.ExtractGitHubData \
   --master spark://10.0.0.9:7077 \
   --executor-memory 3G \
-  {{ params.hdfs_dir }}/code/insight-assembly-0.4.jar \
+  {{ params.hdfs_dir }}/code/insight-assembly-1.0.jar \
   {{ ds }}
     """,
     params = {'hdfs_dir': hdfs_dir},
     dag = dag
 )
 
-# An interface to cockroachdb
-def execute_sql(command):
-    # Setup the connection
-    connection = psycopg2.connect(database='insight', user='maxroach', host='ec2-52-36-220-17.us-west-2.compute.amazonaws.com', port=26257)
-    connection.set_session(autocommit = True)
-    cur = connection.cursor()
-
-    # Execute the command server side
-    try:
-        cur.execute(command)
-    except:
-        raise ValueError('Error executing commit update')
-    # Close the cursor and connection
-    cur.close()
-    connection.close()
-
-# Prep the command to update commits
-insert_commits_command = """
-INSERT INTO commits
-	SELECT commit_date,
-		language_name,
-		import_name,
-		usage_count
-		FROM received_commits
-		WHERE received_date = '{{ ds }}'
-		ON CONFLICT (commit_date, language_name, import_name) DO UPDATE SET usage_count = commits.usage_count + excluded.usage_count
-;"""
-cockroachdb_insert_commits = PythonOperator(
+# insert commits in cockroachdb
+cockroachdb_commits = PostgresOperator(
     task_id = 'cockroachdb_insert_commits',
-    python_callable = execute_sql,
-    op_kwargs={'command': insert_commits_command},
-    dag=dag
+    postgres_conn_id = 'cockroachdb',
+    autocommit = True,
+    sql = """
+    INSERT INTO commits
+    	SELECT commit_date,
+    		language_name,
+    		import_name,
+    		usage_count
+    		FROM received_commits
+    		WHERE received_date = '{{ ds }}'
+    		ON CONFLICT (commit_date, language_name, import_name) DO UPDATE SET usage_count = commits.usage_count + excluded.usage_count
+    ;""",
+    dag = dag
+)
+
+cockroachdb_daily_import_summary = PostgresOperator(
+    task_id = 'cockroachdb_daily_import_summary',
+    postgres_conn_id = 'cockroachdb',
+    autocommit = True,
+    sql = """
+    WITH import_summary AS (
+    	SELECT	commit_date,
+    			language_name,
+    			import_name,
+    			usage_count,
+    			ROW_NUMBER() OVER (PARTITION BY language_name ORDER BY usage_count DESC) AS row_number
+    		FROM commits
+    		WHERE commit_date = '{{ ds }}'
+    	)
+    UPSERT INTO daily_import_summary (
+    	summary_date,
+    	language_name,
+    	import_name,
+    	usage_count
     )
+    SELECT  commit_date,
+    		language_name,
+    		import_name,
+    		usage_count
+    	FROM import_summary
+    	WHERE row_number <= 10
+    ;""",
+    dag = dag
+)
+
+cockroachdb_daily_language_totals = PostgresOperator(
+    task_id = 'cockroachdb_daily_language_totals',
+    postgres_conn_id = 'cockroachdb',
+    autocommit = True,
+    sql = """
+    UPSERT INTO daily_language_totals (
+    	language_name,
+    	commit_date,
+    	total_daily_usage
+    )
+    SELECT language_name,
+    		commit_date,
+    		CAST(SUM(usage_count) AS INT) AS total_daily_usage
+    	FROM received_commits
+    	WHERE received_date = '{{ ds }}'
+    	GROUP BY commit_date,
+    		language_name
+    ;""",
+    dag = dag
+)
 
 download.set_upstream(check_for_new_dump)
 bsondump.set_upstream(download)
 remove_staging_file.set_upstream(bsondump)
 spark_parse_commits.set_upstream(remove_staging_file)
-cockroachdb_insert_commits.set_upstream(spark_parse_commits)
+cockroachdb_commits.set_upstream(spark_parse_commits)
+cockroachdb_daily_import_summary.set_upstream(spark_parse_commits)
+cockroachdb_daily_language_totals.set_upstream(spark_parse_commits)
