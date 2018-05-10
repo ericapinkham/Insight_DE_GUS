@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 default_args = {
     'owner': 'eric',
     'depends_on_past': True,
-    'start_date': datetime(2017, 4, 1),
+    'start_date': datetime(2018, 4, 1),
     'email': ['eric.a.pinkham+airflow@gmail.com'],
     'email_on_failure': False,
     'email_on_retry': False,
