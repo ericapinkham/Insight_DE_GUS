@@ -5,7 +5,7 @@ package Jobs
   */
 trait DBConnection {
   // MySQL settings
-  private val host: String = "ec2-52-36-220-17.us-west-2.compute.amazonaws.com"
+  private val host: String = "internal-CockroachDB-408925475.us-west-2.elb.amazonaws.com"
   private val port: Int = 26257
   private val database: String = "insight"
   private val user: String = "maxroach"

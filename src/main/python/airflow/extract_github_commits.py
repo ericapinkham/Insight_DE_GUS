@@ -9,12 +9,12 @@ from datetime import datetime, timedelta
 
 default_args = {
     'owner': 'eric',
-    'depends_on_past': False,
+    'depends_on_past': True,
     'start_date': datetime(2017, 4, 1),
     'email': ['eric.a.pinkham+airflow@gmail.com'],
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 5,
     'retry_delay': timedelta(minutes = 5)
     # 'concurrency': 4
 }
@@ -149,5 +149,5 @@ bsondump.set_upstream(download)
 remove_staging_file.set_upstream(bsondump)
 spark_parse_commits.set_upstream(remove_staging_file)
 cockroachdb_commits.set_upstream(spark_parse_commits)
-cockroachdb_daily_import_summary.set_upstream(spark_parse_commits)
-cockroachdb_daily_language_totals.set_upstream(spark_parse_commits)
+cockroachdb_daily_import_summary.set_upstream(cockroachdb_commits)
+cockroachdb_daily_language_totals.set_upstream(cockroachdb_commits)

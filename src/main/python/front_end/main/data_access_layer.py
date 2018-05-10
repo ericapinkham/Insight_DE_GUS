@@ -4,6 +4,8 @@ import pandas as pd
 
 def fetch(query):
     connection = psycopg2.connect(database='insight', user='maxroach', host='ec2-52-36-220-17.us-west-2.compute.amazonaws.com', port=26257)
+    #connection = psycopg2.connect(database='insight', user='maxroach', host='internal-CockroachDB-408925475.us-west-2.elb.amazonaws.com', port=26257)
+
     # connection.sql_mode = [SQLMode.ANSI_QUOTES]
     df = pd.read_sql(query, connection)
     connection.close()
