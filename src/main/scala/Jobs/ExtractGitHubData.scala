@@ -33,7 +33,7 @@ object ExtractGitHubData extends DBConnection {
       .flatMap{s => extractCommit(s, loadDate)}
       .repartition(500)(Ordering[CommitRecord])
       .toDF()
-      .groupBy("received_date", "language_name", "import_name")
+      .groupBy("commit_date", "language_name", "import_name")
       .sum("usage_count")
       .withColumnRenamed("sum(usage_count)", "usage_count")
 

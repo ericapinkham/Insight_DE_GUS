@@ -75,24 +75,6 @@ spark-submit \
     dag = dag
 )
 
-# insert commits in cockroachdb
-cockroachdb_commits = PostgresOperator(
-    task_id = 'cockroachdb_insert_commits',
-    postgres_conn_id = 'cockroachdb',
-    autocommit = True,
-    sql = """
-    INSERT INTO commits
-    	SELECT commit_date,
-    		language_name,
-    		import_name,
-    		usage_count
-    		FROM received_commits
-    		WHERE received_date = '{{ ds }}'
-    		ON CONFLICT (commit_date, language_name, import_name) DO UPDATE SET usage_count = commits.usage_count + excluded.usage_count
-    ;""",
-    dag = dag
-)
-
 cockroachdb_daily_import_summary = PostgresOperator(
     task_id = 'cockroachdb_daily_import_summary',
     postgres_conn_id = 'cockroachdb',
@@ -136,8 +118,8 @@ cockroachdb_daily_language_totals = PostgresOperator(
     SELECT language_name,
     		commit_date,
     		CAST(SUM(usage_count) AS INT) AS total_daily_usage
-    	FROM received_commits
-    	WHERE received_date = '{{ ds }}'
+    	FROM commits
+    	WHERE commit_date = '{{ ds }}'
     	GROUP BY commit_date,
     		language_name
     ;""",
@@ -148,6 +130,5 @@ download.set_upstream(check_for_new_dump)
 bsondump.set_upstream(download)
 remove_staging_file.set_upstream(bsondump)
 spark_parse_commits.set_upstream(remove_staging_file)
-cockroachdb_commits.set_upstream(spark_parse_commits)
-cockroachdb_daily_import_summary.set_upstream(cockroachdb_commits)
-cockroachdb_daily_language_totals.set_upstream(cockroachdb_commits)
+cockroachdb_daily_import_summary.set_upstream(spark_parse_commits)
+cockroachdb_daily_language_totals.set_upstream(spark_parse_commits)

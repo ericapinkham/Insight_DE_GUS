@@ -31,7 +31,6 @@ object CommitRecord extends Languages {
     }
   }
 
-
   private def extract(rawJson: String, date: String): List[CommitRecord] = {
     // Remove the MongoDB ObjectID
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
@@ -60,12 +59,12 @@ object CommitRecord extends Languages {
 
 /**
   * Case class to store extracted commits
-  * @param received_date
+  * @param commit_date
   * @param language_name
   * @param import_name
   * @param usage_count
   */
-case class CommitRecord(received_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
+case class CommitRecord(commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
   // Define an ordering so that Spark can repartition appropriately
-  def compare(that: CommitRecord): Int = (this.received_date, this.language_name, this.import_name) compare (that.received_date, that.language_name, import_name)
+  def compare(that: CommitRecord): Int = (this.commit_date, this.language_name, this.import_name) compare (that.commit_date, that.language_name, import_name)
 }
