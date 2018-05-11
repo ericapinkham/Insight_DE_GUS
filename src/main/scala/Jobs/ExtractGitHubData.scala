@@ -33,14 +33,14 @@ object ExtractGitHubData extends DBConnection {
       .flatMap{s => extractCommit(s, loadDate)}
       .repartition(500)(Ordering[CommitRecord])
       .toDF()
-      .groupBy("received_date", "commit_date", "language_name", "import_name")
+      .groupBy("received_date", "language_name", "import_name")
       .sum("usage_count")
       .withColumnRenamed("sum(usage_count)", "usage_count")
 
     commitsDf
       .write
       .mode(SaveMode.Append)
-      .jdbc(connectionString, "received_commits", jdbcProperties)
+      .jdbc(connectionString, "commits", jdbcProperties)
 
     // Update imports
     val importsDf = spark.read.jdbc(connectionString, "imports", jdbcProperties)

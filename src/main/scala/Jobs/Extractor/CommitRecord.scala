@@ -31,16 +31,8 @@ object CommitRecord extends Languages {
     }
   }
 
-  def extractDate(dateTime: String, default: String): String = {
-    val datePattern = """(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}Z""".r
-    
-    dateTime match {
-      case datePattern(dateString) => dateString
-      case _ => default
-    }
-  }
 
-  private def extract(rawJson: String, defaultDate: String): List[CommitRecord] = {
+  private def extract(rawJson: String, date: String): List[CommitRecord] = {
     // Remove the MongoDB ObjectID
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
 
@@ -48,8 +40,6 @@ object CommitRecord extends Languages {
     def truncate(n: Int)(s: String): String = s.substring(0, Math.min(s.length, n))
 
     val jsonCommit = Json.parse(removeObjectId(rawJson))
-
-    val commitDate = extractDate((jsonCommit \ "commit" \ "committer" \ "date").validate[String].getOrElse(null), defaultDate)
 
     val files = (jsonCommit \ "files").validate[List[JsValue]].getOrElse(List[JsValue]()) //.getOrElse(List[Map[String, Any]]())
     val fileTuples = for (file <- files) yield (
@@ -62,7 +52,7 @@ object CommitRecord extends Languages {
       case (language, patch) =>
         extractPackages(language, patch).map{
           case (count, packageName) =>
-            CommitRecord(defaultDate, commitDate, truncate(64)(language), truncate(1024)(packageName), count)
+            CommitRecord(date, truncate(64)(language), truncate(1024)(packageName), count)
       }
     }
   }
@@ -71,12 +61,11 @@ object CommitRecord extends Languages {
 /**
   * Case class to store extracted commits
   * @param received_date
-  * @param commit_date
   * @param language_name
   * @param import_name
   * @param usage_count
   */
-case class CommitRecord(received_date: String, commit_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
+case class CommitRecord(received_date: String, language_name: String, import_name: String, usage_count: Int)  extends Ordered[CommitRecord] {
   // Define an ordering so that Spark can repartition appropriately
-  def compare(that: CommitRecord): Int = (this.commit_date, this.language_name, this.import_name) compare (that.commit_date, that.language_name, import_name)
+  def compare(that: CommitRecord): Int = (this.received_date, this.language_name, this.import_name) compare (that.received_date, that.language_name, import_name)
 }
