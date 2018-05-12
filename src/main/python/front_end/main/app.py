@@ -11,7 +11,6 @@ from dash.dependencies import Input, Output, State
 import colorsys
 from flask import Flask
 import data_access_layer as dal
-import base64
 
 # Here"s my cool App
 server = Flask(__name__)
@@ -34,8 +33,6 @@ LANGUAGES = [
     "Scala"
 ]
 
-GUS_LOGO = base64.b64encode(open('./GUS_logo.png', 'rb').read())
-
 # Define the components
 language_dropdown = dcc.Dropdown(
     id = "language_dropdown",
@@ -54,12 +51,21 @@ app.layout = html.Div(
     style = {"backgroundColor": colors["blue"], "color": colors["white"]},
     className = 'ten columns offset-by-one',
     children = [
-        html.Img(src='data:image/png;base64,{}'.format(GUS_LOGO)),
         html.Div(
             style = {'margin-left': '60', 'margin-right': '60', 'margin-bottom': '60', 'margin-top': '30'},
             children = [
-                html.H1("GitHub Import Analytics", style={"textAlign": "center"}),
-                # subtitle,
+                html.Div([
+                    html.Div([html.H1("GitHub Import Analytics", style={"textAlign": "center"})],
+                        className = 'eight columns'
+                        ),
+                    html.Div([html.Img(src='https://raw.githubusercontent.com/ericapinkham/Insight_DE_GUS/master/src/main/resources/GUS_logo.png',
+                        style = {'size': '10'}
+                        )],
+                        className = 'four columns'
+                        )
+                    ],
+                    className = 'row'
+                    ),
                 html.Div(style = {'color': colors['blue']},
                 className = 'row',
                 children = [
