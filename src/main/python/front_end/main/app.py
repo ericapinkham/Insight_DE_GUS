@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, State
 import colorsys
 from flask import Flask
 import data_access_layer as dal
-
+import base64
 
 # Here"s my cool App
 server = Flask(__name__)
@@ -34,6 +34,8 @@ LANGUAGES = [
     "Scala"
 ]
 
+GUS_LOGO = base64.b64encode(open('./GUS_logo.png', 'rb').read())
+
 # Define the components
 language_dropdown = dcc.Dropdown(
     id = "language_dropdown",
@@ -48,17 +50,11 @@ package_dropdown = dcc.Dropdown(
     placeholder="Select an import",
 )
 
-end_date = date.today() - timedelta(1)
-eval_date = dcc.DatePickerRange(
-    id = 'eval_date',
-    start_date = end_date - timedelta(weeks = 2),
-    end_date = end_date
-)
-
 app.layout = html.Div(
     style = {"backgroundColor": colors["blue"], "color": colors["white"]},
     className = 'ten columns offset-by-one',
     children = [
+        html.Img(src='data:image/png;base64,{}'.format(GUS_LOGO)),
         html.Div(
             style = {'margin-left': '60', 'margin-right': '60', 'margin-bottom': '60', 'margin-top': '30'},
             children = [
@@ -82,7 +78,11 @@ app.layout = html.Div(
                     style={'margin-top': '10'}
                     ),
                 html.Div([html.H5("Evaluation Date", style = {'color': colors['white']}),
-                        eval_date
+                        dcc.DatePickerRange(
+                            id = 'eval_date',
+                            start_date = date.today() - timedelta(1) - timedelta(weeks = 2),
+                            end_date = date.today() - timedelta(1)
+                        )
                         ],
                     className='four columns',
                     style={'margin-top': '10'}
@@ -122,18 +122,16 @@ app.css.append_css({
     [Input("eval_date", "end_date")])
 def refresh_language_share_pie(date):
     language_totals = dal.get_language_totals(date)
-    data = dict(
+    figure = go.Figure(
+        data = [go.Pie(
             type='pie',
             labels=language_totals['language_name'],
             values=language_totals['total_daily_usage'],
-            name='Well Type Breakdown',
-            # hoverinfo="label+text+value+percent",
-            # textinfo="label+percent+name",
+            name='Imports by Language',
             hole=0.5
-            # marker=dict(),
-            # domain={"x": [0.55, 1], 'y':[0.2, 0.8]},
-            )
-    figure = dict(data = data)
+            )],
+        layout = go.Layout(title = 'Imports by Language for {}'.format(date))
+        )
     return figure
 
 @app.callback(
@@ -157,7 +155,7 @@ def refresh_import_summary_bar(language, end_date):
                 # marker = go.Marker(color = rgb)
                 )],
             layout = go.Layout(
-                title = 'Daily Import Summary',
+                title = 'Top 10 Imports for {} on {}'.format(language, end_date),
             )
         )
 
@@ -185,7 +183,7 @@ def refresh_imports_by_date_graph(language, packages, start_date, end_date):
     return go.Figure(
             data=[make_trace(package_data, package, colors[i]) for i, package in enumerate(packages)],
             layout = go.Layout(
-                title='Imports over Time',
+                title='Imports: {} to {}'.format(start_date, end_date),
                 showlegend = True,
                 legend = go.Legend(x = 0, y = 1.0),
                 margin = go.Margin(l = 40, r = 40, t = 40, b = 30)

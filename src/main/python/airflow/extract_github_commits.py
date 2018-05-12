@@ -67,7 +67,7 @@ spark_parse_commits = BashOperator(
 spark-submit \
   --class Jobs.ExtractGitHubData \
   --master spark://10.0.0.9:7077 \
-  --executor-memory 3G \
+  --executor-memory 6G \
   {{ params.hdfs_dir }}/code/insight-assembly-1.0.jar \
   {{ ds }}
     """,
