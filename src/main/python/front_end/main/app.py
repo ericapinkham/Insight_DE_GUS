@@ -12,34 +12,32 @@ import colorsys
 from flask import Flask
 import data_access_layer as dal
 
-# Set up the MySQL Connection
-
-colors = {
-    "blue": "#4285f4",
-    "white": "#fff2ff"
-}
-
-
 
 # Here"s my cool App
 server = Flask(__name__)
 app = dash.Dash(__name__, server = server)
 
-title = html.H1(
-    children="GitHub Import Analytics",
-    style={"textAlign": "center", "color": colors["white"]}
-    )
+# Constants
+colors = {
+    "blue": "#4285f4",
+    "white": "#fff2ff"
+}
 
-subtitle = html.Div(
-    children="Insight Data Engineering Rocks",
-    style={"textAlign": "center", "color": colors["white"]}
-    )
+LANGUAGES = [
+    "C#",
+    "Haskell",
+    "Java",
+    "JavaScript",
+    "Kotlin",
+    "Python",
+    "Rust",
+    "Scala"
+]
 
 # Define the components
-unique_languages = dal.get_unique_languages()
 language_dropdown = dcc.Dropdown(
     id = "language_dropdown",
-    options = [{"label": l, "value": l} for l in unique_languages.language],
+    options = [{"label": l, "value": l} for l in LANGUAGES],
     placeholder = "Select a language"
 )
 
@@ -53,36 +51,8 @@ package_dropdown = dcc.Dropdown(
 end_date = date.today() - timedelta(1)
 eval_date = dcc.DatePickerRange(
     id = 'eval_date',
-    start_date = end_date - timedelta(weeks = 4),
+    start_date = end_date - timedelta(weeks = 2),
     end_date = end_date
-)
-
-graph = dcc.Graph(
-    figure = go.Figure(
-        data = [],
-        layout = go.Layout(
-            title = 'Imports by Date',
-            showlegend = True,
-            legend = go.Legend(
-                x = 0,
-                y = 1.0
-            ),
-            margin = go.Margin(l = 40, r = 40, t = 40, b = 30)
-        )
-    ),
-    style={'height': 250},
-    id='package_graph'
-)
-
-package_summary_bar = dcc.Graph(
-    figure = go.Figure(
-            data = [],
-            layout = go.Layout(
-                title = 'Daily Import Summary',
-            )
-        ),
-    style = {'height': 400},
-    id = 'package_summary_bar'
 )
 
 app.layout = html.Div(
@@ -90,28 +60,28 @@ app.layout = html.Div(
     className = 'ten columns offset-by-one',
     children = [
         html.Div(
-            style = {'margin-left': '20', 'margin-right': '20', 'margin-bottom': '20', 'margin-top': '30'},
+            style = {'margin-left': '60', 'margin-right': '60', 'margin-bottom': '60', 'margin-top': '30'},
             children = [
-                title,
+                html.H1("GitHub Import Analytics", style={"textAlign": "center"}),
                 # subtitle,
                 html.Div(style = {'color': colors['blue']},
                 className = 'row',
                 children = [
                 html.Div([
-                        html.Label("Language", style = {'color': colors['white']}),
+                        html.H5("Language", style = {'color': colors['white']}),
                         language_dropdown
                         ],
                     className='four columns',
                     style={'margin-top': '10'}
                     ),
                 html.Div([
-                        html.Label("Import", style = {'color': colors['white']}),
+                        html.H5("Import", style = {'color': colors['white']}),
                         package_dropdown
                         ],
                     className='four columns',
                     style={'margin-top': '10'}
                     ),
-                html.Div([html.Label("Evaluation Date", style = {'color': colors['white']}),
+                html.Div([html.H5("Evaluation Date", style = {'color': colors['white']}),
                         eval_date
                         ],
                     className='four columns',
@@ -119,24 +89,52 @@ app.layout = html.Div(
                     ),
                 ]),
                 html.Div([
-                    html.Div([graph],
-                            className='twelve columns',
-                            style={'margin-top': '10'}
+                    html.Div([
+                        dcc.Graph(
+                            style={'height': 250},
+                            id='imports_by_date_graph'
+                            )],
+                        className='twelve columns',
+                        style={'margin-top': '10'}
                         )], # style = {"backgroundColor": colors["blue"], 'color': colors['white']},
                 className='row',
                 ),
                 html.Div([
-                    html.Div([package_summary_bar],
+                    html.Div([dcc.Graph(id = 'import_summary_bar', style = {'height': 400})],
+                        className='six columns',
+                        style={'margin-top': '10'}
+                        ),
+                    html.Div([dcc.Graph(id = 'language_share_pie', style = {'height': 400})],
                             className='six columns',
                             style={'margin-top': '10'}
-                        )], # style = {"backgroundColor": colors["blue"], 'color': colors['white']},
-                    className='row',
+                        )
+                    ],
+                    className='row'
                 ),
         ])
 ])
 app.css.append_css({
     'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 })
+
+@app.callback(
+    Output("language_share_pie", "figure"),
+    [Input("eval_date", "end_date")])
+def refresh_language_share_pie(date):
+    language_totals = dal.get_language_totals(date)
+    data = dict(
+            type='pie',
+            labels=language_totals['language_name'],
+            values=language_totals['total_daily_usage'],
+            name='Well Type Breakdown',
+            # hoverinfo="label+text+value+percent",
+            # textinfo="label+percent+name",
+            hole=0.5
+            # marker=dict(),
+            # domain={"x": [0.55, 1], 'y':[0.2, 0.8]},
+            )
+    figure = dict(data = data)
+    return figure
 
 @app.callback(
     Output("package_dropdown", "options"),
@@ -146,10 +144,9 @@ def language_dropdown(language):
     return [{"label": l, "value": l} for l in unique_packages.import_name]
 
 @app.callback(
-    Output("package_summary_bar", "figure"),
-    [Input("language_dropdown", "value")],
-    [State("eval_date", "end_date")])
-def update_summary_bar(language, end_date):
+    Output("import_summary_bar", "figure"),
+    [Input("language_dropdown", "value"), Input("eval_date", "end_date")])
+def refresh_import_summary_bar(language, end_date):
     package_data = dal.get_most_used_languages(language, end_date)
     return go.Figure(
             data = [go.Bar(
@@ -166,10 +163,10 @@ def update_summary_bar(language, end_date):
 
 
 @app.callback(
-    Output("package_graph", "figure"),
-    [Input("language_dropdown", "value"), Input("package_dropdown", "value")],
-    [State("eval_date", "start_date"), State("eval_date", "end_date")])
-def update_graph(language, packages, start_date, end_date):
+    Output("imports_by_date_graph", "figure"),
+    [Input("language_dropdown", "value"), Input("package_dropdown", "value"),
+    Input("eval_date", "start_date"), Input("eval_date", "end_date")])
+def refresh_imports_by_date_graph(language, packages, start_date, end_date):
     if packages == None:
         return None
 
@@ -191,9 +188,10 @@ def update_graph(language, packages, start_date, end_date):
                 title='Imports over Time',
                 showlegend = True,
                 legend = go.Legend(x = 0, y = 1.0),
-                margin = go.Margin(l = 40, r = 0, t = 40, b = 30)
+                margin = go.Margin(l = 40, r = 40, t = 40, b = 30)
                 )
             )
+
 def gen_colors(n):
     HSV_tuples = [(x*1.0/n, 0.5, 0.5) for x in range(n)]
     return list(map(lambda x: colorsys.hsv_to_rgb(*x), HSV_tuples))
