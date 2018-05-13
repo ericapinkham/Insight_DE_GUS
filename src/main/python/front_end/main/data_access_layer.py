@@ -54,7 +54,7 @@ def get_packages_by_language(language, date):
             WHERE language_name = '{}'
                 AND summary_date = '{}'
             ORDER BY usage_count DESC
-            LIMIT 10
+            LIMIT 5000
         """.format(language, date)
     return fetch(query)
 
