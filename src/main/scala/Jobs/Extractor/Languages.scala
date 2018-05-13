@@ -1,7 +1,12 @@
 package Jobs.Extractor
 
 trait Languages {
-
+  
+  /**
+    * Process a line from languageNames
+    * @param line a line from languageNames
+    * @return
+    */
   private def processLine(line: String): Array[(String, String)] = {
     line.toString.split(": ") match {
       case Array(language, extensions) =>
@@ -37,7 +42,10 @@ trait Languages {
     .split("\n")
     .flatMap(processLine)
     .toMap
-
+  
+  /**
+    * A list of regex patterns for extracting import statements
+    */
   val languagePatterns: Map[String, List[String]] =
     Map(
       "Python" -> List("""import\s+([0-9a-zA-Z]+)""", """from\s+(\w+?)\s+import\s+(?:[0-9a-zA-Z])"""),

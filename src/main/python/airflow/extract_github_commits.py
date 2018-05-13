@@ -75,6 +75,7 @@ spark-submit \
     dag = dag
 )
 
+# build a daily summary
 cockroachdb_daily_import_summary = PostgresOperator(
     task_id = 'cockroachdb_daily_import_summary',
     postgres_conn_id = 'cockroachdb',
@@ -105,6 +106,7 @@ cockroachdb_daily_import_summary = PostgresOperator(
     dag = dag
 )
 
+# Get daily language totals
 cockroachdb_daily_language_totals = PostgresOperator(
     task_id = 'cockroachdb_daily_language_totals',
     postgres_conn_id = 'cockroachdb',
@@ -126,6 +128,7 @@ cockroachdb_daily_language_totals = PostgresOperator(
     dag = dag
 )
 
+# define the DAG edges
 download.set_upstream(check_for_new_dump)
 bsondump.set_upstream(download)
 remove_staging_file.set_upstream(bsondump)

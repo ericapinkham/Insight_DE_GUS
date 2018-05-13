@@ -3,8 +3,7 @@ import Jobs.Extractor.CommitRecord.{extractLanguage, extractPackages}
 import org.scalatest.FunSuite
 
 class CommitRecordTestSuite extends FunSuite {
-  // placeholder for unit testing.
-
+  
   test("Language Extraction 01") {
     assert(extractLanguage("hello_world.py") === "Python")
     assert(extractLanguage("     hello_world.hs       ") === "Haskell")

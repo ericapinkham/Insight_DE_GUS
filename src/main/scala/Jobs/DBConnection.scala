@@ -4,7 +4,7 @@ package Jobs
   * Store CockroachDB connection properties so that I don't have to do this all over the place
   */
 trait DBConnection {
-  // MySQL settings
+  // CockroachDB settings
   private val host: String = "internal-CockroachDB-408925475.us-west-2.elb.amazonaws.com"
   private val port: Int = 26257
   private val database: String = "insight"

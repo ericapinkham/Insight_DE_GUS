@@ -3,10 +3,8 @@ import psycopg2
 import pandas as pd
 
 def fetch(query):
-    connection = psycopg2.connect(database='insight', user='maxroach', host='ec2-52-36-220-17.us-west-2.compute.amazonaws.com', port=26257)
-    #connection = psycopg2.connect(database='insight', user='maxroach', host='internal-CockroachDB-408925475.us-west-2.elb.amazonaws.com', port=26257)
-
-    # connection.sql_mode = [SQLMode.ANSI_QUOTES]
+    # connection = psycopg2.connect(database='insight', user='maxroach', host='ec2-52-36-220-17.us-west-2.compute.amazonaws.com', port = 26257)
+    connection = psycopg2.connect(database='insight', user='maxroach', host='internal-CockroachDB-408925475.us-west-2.elb.amazonaws.com', port = 26257)
     df = pd.read_sql(query, connection)
     connection.close()
     return df
@@ -40,11 +38,12 @@ def get_usage_by_import(language, packages, begin_date, end_date):
         SELECT  commit_date,
                 {}
             FROM commits
-            WHERE import_name IN ({})
+            WHERE language_name = '{}'
+                AND import_name IN ({})
                 AND commit_date BETWEEN '{}' AND '{}'
             GROUP BY commit_date
             ORDER BY commit_date;
-        """.format(pivots, in_clause, begin_date, end_date)
+        """.format(pivots, language, in_clause, begin_date, end_date)
     return fetch(query)
 
 def get_packages_by_language(language, date):

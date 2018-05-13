@@ -14,7 +14,13 @@ object CommitRecord extends Languages {
       case Some(m) => languageNames.getOrElse(m.group(1), "")
     }
   }
-
+  
+  /**
+    * Extracts all import statements from a given patch file
+    * @param language the programming language of the file
+    * @param patch the patch file
+    * @return
+    */
   def extractPackages(language: String, patch: String): List[(Int, String)] = {
     def prepPattern(pattern: String): Regex = ("""(\+|\-)\s*""" + pattern).r
     languagePatterns.getOrElse(language, List[String]())
@@ -22,7 +28,13 @@ object CommitRecord extends Languages {
       .findAllMatchIn(patch)
       .map(m => (if (m.group(1) == "+") 1 else if (m.group(1) == "-") -1 else 0, m.group(2))))
   }
-
+  
+  /**
+    * Wrapper for extracting the patch file with error handling
+    * @param rawJson the raw json to be parsed
+    * @param date the date
+    * @return
+    */
   def extractCommit(rawJson: String, date: String): List[CommitRecord] = {
     try {
       extract(rawJson, date)
@@ -30,7 +42,13 @@ object CommitRecord extends Languages {
       case _: Throwable => List[CommitRecord]()
     }
   }
-
+  
+  /**
+    * Actually does the extraction
+    * @param rawJson the raw json to be parsed
+    * @param date the date
+    * @return
+    */
   private def extract(rawJson: String, date: String): List[CommitRecord] = {
     // Remove the MongoDB ObjectID
     def removeObjectId(input: String): String = input.replaceFirst("""ObjectId\(\s(\"[0-9a-z]*\")\s\)""", "$1")
