@@ -17,7 +17,7 @@ def get_most_used_languages(language, date):
                 usage_count
             FROM daily_import_summary
             WHERE language_name = '{}'
-                AND commit_date = '{}'
+                AND summary_date = '{}'
             ORDER BY usage_count DESC
             LIMIT 10
         """.format(language, date)
@@ -47,13 +47,15 @@ def get_usage_by_import(language, packages, begin_date, end_date):
         """.format(pivots, in_clause, begin_date, end_date)
     return fetch(query)
 
-def get_packages_by_language(language):
+def get_packages_by_language(language, date):
     query = """
         SELECT  import_name
-                FROM imports
+            FROM daily_import_summary
             WHERE language_name = '{}'
-            ORDER BY import_name
-        """.format(language)
+                AND summary_date = '{}'
+            ORDER BY usage_count DESC
+            LIMIT 10
+        """.format(language, date)
     return fetch(query)
 
 def get_unique_languages():

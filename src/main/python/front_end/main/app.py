@@ -153,9 +153,10 @@ def refresh_language_share_pie(clicks, date):
 
 @app.callback(
     Output("package_dropdown", "options"),
-    [Input("language_dropdown", "value")])
-def language_dropdown(language):
-    unique_packages = dal.get_packages_by_language(language)
+    [Input("language_dropdown", "value")],
+    [State("eval_date", "end_date")])
+def language_dropdown(language, date):
+    unique_packages = dal.get_packages_by_language(language, date)
     return [{"label": l, "value": l} for l in unique_packages.import_name]
 
 @app.callback(
