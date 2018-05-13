@@ -16,7 +16,8 @@ class CommitRecordTestSuite extends FunSuite {
   test("Python Packages") {
     // Python
     val pythonImports =
-      """+from unittest import TestCase as TC, main
+      """
+        |+from unittest import TestCase as TC, main
         |+import time
         |-import pandas
       """.stripMargin
@@ -26,7 +27,8 @@ class CommitRecordTestSuite extends FunSuite {
   test("Scala Packages") {
     // Scala
     val scalaImports =
-      """+      import org.apache.spark
+      """
+        |+      import org.apache.spark
         |       +import org.apache.spark.{SparkConf, SparkContext}
         |+import org.apache.spark.sql.SQLContext
         |-import       org.apache.spark.sql.SparkSession"""
@@ -42,7 +44,8 @@ class CommitRecordTestSuite extends FunSuite {
   test("Java Packages") {
     // Java
     val javaImports =
-      """+import static java.awt.Color;
+      """
+        |+import static java.awt.Color;
         |+import java.awt.*;
         |-import javax.swing.JOptionPane;"""
     assert(extractPackages("Java", javaImports).toSet ===
@@ -57,7 +60,8 @@ class CommitRecordTestSuite extends FunSuite {
   test("Haskell Packages") {
     // Haskell
     val haskellImports =
-      """+import Mod1
+      """
+        |+import Mod1
         |+import Mod2 (x,y)
         |-import qualified Mod3
         |-import qualified Mod4
@@ -77,7 +81,8 @@ class CommitRecordTestSuite extends FunSuite {
 
   test("Rust Packages") {
     val rustImports =
-      """+use TrafficLight::*;
+      """
+        |+use TrafficLight::*;
         |+use APackage::{Red, Yellow};
       """.stripMargin
     assert(extractPackages("Rust", rustImports).toSet === Set((1, "TrafficLight"), (1, "APackage")))
@@ -85,7 +90,8 @@ class CommitRecordTestSuite extends FunSuite {
 
   test("JavaScript Imports") {
     val javaScriptImports =
-      """+import defaultExport from "module-name1";
+      """
+        |+import defaultExport from "module-name1";
         |+import * as name from "module-name2";
         |+import { export } from "module-name3";
         |+import { export as alias } from "module-name4";
@@ -100,7 +106,8 @@ class CommitRecordTestSuite extends FunSuite {
 
   test("Kotlin Imports") {
     val kotlinImports =
-      """+import fooBar
+      """
+        |+import fooBar
         |+import foo.*
         |+import foo.Bar
         |+import bar.Bar as bBar
@@ -110,11 +117,73 @@ class CommitRecordTestSuite extends FunSuite {
 
   test("C# Imports") {
     val cSharpImports =
-      """+using System.Text;
+      """
+        |+using System.Text;
         |+using static System.Math;
         |+using Project = PC.MyCompany.Project;
       """.stripMargin
 
     assert(extractPackages("C#", cSharpImports).toSet === Set((1, "System.Text"), (1, "System.Math"), (1, "PC.MyCompany.Project")))
+  }
+  
+  test("TypeScript Imports") {
+    val typeScriptImports =
+      """
+        |+import { ZipCodeValidator as ZCV } from "./ZipCodeValidator";
+        |+import { ZipCodeValidator as ZCV } from './lib/predicates/weak-map';
+        |+import * as validator from './lib/predicates/base-predicate';
+        |+import * as validator from './lib/under_score';
+        |+import "./my-module.js";
+        |+import PropTypes from 'prop-types'
+      """.stripMargin
+    assert(extractPackages("TypeScript", typeScriptImports).toSet ===
+      Set(
+        (1, "ZipCodeValidator"),
+        (1, "lib/predicates/weak-map"),
+        (1, "lib/predicates/base-predicate"),
+        (1, "lib/under_score"),
+        (1, "my-module.js"),
+        (1, "prop-types")
+      ))
+  }
+  
+  test("F# Imports") {
+    val fSharpImports =
+      """
+        |+open Fake
+        |+open Fake.AssemblyInfoFile
+        |+open Fake.Git
+        |+open Fake.ReleaseNotesHelper
+        |+open Fable
+        |+open Fable.AST
+      """.stripMargin
+    
+    assert(extractPackages("F#", fSharpImports).toSet ===
+      Set(
+        (1, "Fake"),
+        (1, "Fake.AssemblyInfoFile"),
+        (1, "Fake.Git"),
+        (1, "Fake.ReleaseNotesHelper"),
+        (1, "Fable"),
+        (1, "Fable.AST")
+      )
+    )
+  }
+  
+  test("Swift Imports") {
+    val swiftImports =
+      """
+        |+import UIKit
+        |+import UIKit.UITableViewController
+        |+import class UIKit.UITableViewController
+      """.stripMargin
+    
+    assert(extractPackages("Swift", swiftImports).toSet ===
+      Set(
+        (1, "UIKit"),
+        (1, "UIKit.UITableViewController"),
+        (1, "UIKit.UITableViewController")
+      )
+    )
   }
 }

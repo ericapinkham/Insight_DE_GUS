@@ -47,6 +47,9 @@ trait Languages {
       "C#" -> List("""using\s+(?:static|[a-zA-Z0-9]+\s*\=\s*|)\s*([0-9a-zA-Z\.]*[0-9a-zA-Z])"""),
       "Rust" -> List("""use\s+([a-zA-Z0-9]+)::.+?;"""),
       "JavaScript" -> List("""import.*?(?:\"|\')(.*?)(?:\"|\')"""),
-      "Kotlin" -> List("""import\s+([0-9a-zA-Z\.]*[0-9a-zA-Z]+)""")
+      "Kotlin" -> List("""import\s+([0-9a-zA-Z\.]*[0-9a-zA-Z]+)"""),
+      "TypeScript" -> List("""import\s+.*(?:\"|\')(?:\.\/)?([\.\w\/\-\_]+)(?:\"|\')"""),
+      "Swift" -> List("""import\s+(?:[\.\w\/\-\_]+\s)?([\.\w\/\-\_]+)"""),
+      "F#" -> List("""open\s+([\.\w\/\-\_]+)""")
     )
 }

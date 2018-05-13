@@ -100,7 +100,7 @@ cockroachdb_daily_import_summary = PostgresOperator(
     		import_name,
     		usage_count
     	FROM import_summary
-    	WHERE row_number <= 10
+    	WHERE row_number <= 5000
     ;""",
     dag = dag
 )

@@ -3,6 +3,7 @@ package Jobs
 import Jobs.Extractor.CommitRecord
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.storage.StorageLevel.MEMORY_ONLY_SER
 import Jobs.Extractor.CommitRecord.extractCommit
 
 /**
@@ -30,6 +31,7 @@ object ExtractGitHubData extends DBConnection {
 
     // Read text files into spark RDD, map to objects and convert to DF
     val commitsDf = sc.textFile(s"hdfs://10.0.0.9:9000/data/commits_$loadDate.json")
+      .persist(MEMORY_ONLY_SER)
       .flatMap{s => extractCommit(s, loadDate)}
       .repartition(500)(Ordering[CommitRecord])
       .toDF()

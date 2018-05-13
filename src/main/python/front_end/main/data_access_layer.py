@@ -13,18 +13,13 @@ def fetch(query):
 
 def get_most_used_languages(language, date):
     query = """
-        WITH import_summary AS (
-            SELECT  *,
-                    ROW_NUMBER() OVER (PARTITION BY language_name ORDER BY usage_count DESC) AS RowNumber
-                FROM commits
-                WHERE language_name = '{}'
-                    AND commit_date = '{}'
-            )
         SELECT  import_name,
                 usage_count
-            FROM import_summary
-            WHERE RowNumber <= 10
+            FROM daily_import_summary
+            WHERE language_name = '{}'
+                AND commit_date = '{}'
             ORDER BY usage_count DESC
+            LIMIT 10
         """.format(language, date)
     return fetch(query)
 
@@ -36,7 +31,7 @@ def get_language_totals(date):
             WHERE commit_date = '{}'
             """.format(date)
     return fetch(query)
-    
+
 def get_usage_by_import(language, packages, begin_date, end_date):
     pivots = ",".join(["""SUM(CASE WHEN import_name = '{0}' THEN usage_count ELSE 0 END) "{0}" """.format(package) for package in packages])
     in_clause = ",".join(["'{}'".format(package) for package in packages])

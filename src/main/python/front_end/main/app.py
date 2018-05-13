@@ -24,13 +24,16 @@ colors = {
 
 LANGUAGES = [
     "C#",
+    "F#",
     "Haskell",
     "Java",
     "JavaScript",
     "Kotlin",
     "Python",
     "Rust",
-    "Scala"
+    "Scala",
+    "Swift",
+    "TypeScript"
 ]
 
 # Define the components
@@ -52,16 +55,14 @@ app.layout = html.Div(
     className = 'ten columns offset-by-one',
     children = [
         html.Div(
-            style = {'margin-left': '60', 'margin-right': '60', 'margin-bottom': '60', 'margin-top': '30'},
+            style = {'margin-left': '30', 'margin-right': '30', 'margin-bottom': '30', 'margin-top': '30'},
             children = [
                 html.Div([
-                    html.Div([html.H1("GitHub Import Analytics", style={"textAlign": "center"})],
-                        className = 'eight columns'
+                    html.Div([html.H1("GUS: GitHub Usage Statistics")],
+                        className = 'eleven columns'
                         ),
-                    html.Div([html.Img(src='https://raw.githubusercontent.com/ericapinkham/Insight_DE_GUS/master/src/main/resources/GUS_logo.png',
-                        style = {'size': '10'}
-                        )],
-                        className = 'four columns'
+                    html.Div([html.Img(src='https://raw.githubusercontent.com/ericapinkham/Insight_DE_GUS/master/src/main/resources/GUS_logo.png')],
+                        className = 'one columns'
                         )
                     ],
                     className = 'row'
@@ -70,18 +71,16 @@ app.layout = html.Div(
                 className = 'row',
                 children = [
                 html.Div([
-                        html.H5("Language", style = {'color': colors['white']}),
+                        html.H5("Language", style = {'color': colors['white'], 'height': '38'}),
                         language_dropdown
                         ],
-                    className='four columns',
-                    style={'margin-top': '10'}
+                    className='two columns'
                     ),
                 html.Div([
-                        html.H5("Import", style = {'color': colors['white']}),
+                        html.H5("Import", style = {'color': colors['white'], 'height': '38'}),
                         package_dropdown
                         ],
-                    className='four columns',
-                    style={'margin-top': '10'}
+                    className='five columns'
                     ),
                 html.Div([html.H5("Evaluation Date", style = {'color': colors['white']}),
                         dcc.DatePickerRange(
@@ -90,14 +89,25 @@ app.layout = html.Div(
                             end_date = date.today() - timedelta(1)
                         )
                         ],
-                    className='four columns',
-                    style={'margin-top': '10'}
+                    className='three columns'
                     ),
+                html.Div([
+                    html.Button('Fetch', id='fetch_button',
+                    style = {
+                        'color': colors['blue'],
+                        'backgroundColor': colors['white'],
+                        'height': '38',
+                        'marginTop': '45',
+                        'marginLeft': '90',
+                        'fontSize': '16'
+                        })],
+                    className='one columns'
+                    )
                 ]),
                 html.Div([
                     html.Div([
                         dcc.Graph(
-                            style={'height': 250},
+                            style={'height': 300},
                             id='imports_by_date_graph'
                             )],
                         className='twelve columns',
@@ -125,8 +135,9 @@ app.css.append_css({
 
 @app.callback(
     Output("language_share_pie", "figure"),
-    [Input("eval_date", "end_date")])
-def refresh_language_share_pie(date):
+    [Input('fetch_button', 'n_clicks')],
+    [State("eval_date", "end_date")])
+def refresh_language_share_pie(clicks, date):
     language_totals = dal.get_language_totals(date)
     figure = go.Figure(
         data = [go.Pie(
@@ -149,8 +160,8 @@ def language_dropdown(language):
 
 @app.callback(
     Output("import_summary_bar", "figure"),
-    [Input("language_dropdown", "value"), Input("eval_date", "end_date")])
-def refresh_import_summary_bar(language, end_date):
+    [Input('fetch_button', 'n_clicks')],[State("language_dropdown", "value"), State("eval_date", "end_date")])
+def refresh_import_summary_bar(clicks, language, end_date):
     package_data = dal.get_most_used_languages(language, end_date)
     return go.Figure(
             data = [go.Bar(
@@ -168,9 +179,10 @@ def refresh_import_summary_bar(language, end_date):
 
 @app.callback(
     Output("imports_by_date_graph", "figure"),
-    [Input("language_dropdown", "value"), Input("package_dropdown", "value"),
-    Input("eval_date", "start_date"), Input("eval_date", "end_date")])
-def refresh_imports_by_date_graph(language, packages, start_date, end_date):
+    [Input('fetch_button', 'n_clicks')],
+    [State("language_dropdown", "value"), State("package_dropdown", "value"),
+    State("eval_date", "start_date"), State("eval_date", "end_date")])
+def refresh_imports_by_date_graph(clicks, language, packages, start_date, end_date):
     if packages == None:
         return None
 
