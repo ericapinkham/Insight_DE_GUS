@@ -83,7 +83,7 @@ def serve_layout():
                     html.Div([html.H5("Evaluation Date", style = {"color": colors["white"]}),
                             dcc.DatePickerRange(
                                 id = "eval_date",
-                                start_date = date.today() - timedelta(1) - timedelta(weeks = 2),
+                                start_date = date.today() - timedelta(1) - timedelta(weeks = 1),
                                 end_date = date.today() - timedelta(1)
                             )
                             ],
