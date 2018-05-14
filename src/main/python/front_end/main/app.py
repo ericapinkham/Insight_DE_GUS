@@ -40,93 +40,95 @@ title_font = {"size": 24}
 annotation_font = {"size": 16}
 
 # Layout
-app.layout = html.Div(
-    style = {"backgroundColor": colors["blue"], "color": colors["white"]},
-    className = "ten columns offset-by-one",
-    children = [
-        html.Div(
-            style = {"margin-left": "30", "margin-right": "30", "margin-bottom": "30", "margin-top": "30"},
-            children = [
-                html.Div([
-                    html.Div([html.H1("GUS: GitHub Usage Statistics")],
-                        className = "eleven columns"
+def serve_layout():
+    return html.Div(
+        style = {"backgroundColor": colors["blue"], "color": colors["white"]},
+        className = "ten columns offset-by-one",
+        children = [
+            html.Div(
+                style = {"margin-left": "30", "margin-right": "30", "margin-bottom": "30", "margin-top": "30"},
+                children = [
+                    html.Div([
+                        html.Div([html.H1("GUS: GitHub Usage Statistics")],
+                            className = "eleven columns"
+                            ),
+                        html.Div([html.Img(src = "https://raw.githubusercontent.com/ericapinkham/Insight_DE_GUS/master/src/main/resources/GUS_logo.png", width = "100%")],
+                            className = "one columns"
+                            )
+                        ],
+                        className = "row"
                         ),
-                    html.Div([html.Img(src = "https://raw.githubusercontent.com/ericapinkham/Insight_DE_GUS/master/src/main/resources/GUS_logo.png", width = "100%")],
+                    html.Div(style = {"color": colors["blue"]},
+                    className = "row",
+                    children = [
+                    html.Div([
+                        html.H5("Language", style = {"color": colors["white"], "height": "38"}),
+                        dcc.Dropdown(
+                            id = "language_dropdown",
+                            options = [{"label": l, "value": l} for l in LANGUAGES],
+                            placeholder = "Select a language"
+                        )],
+                        className = "two columns"
+                        ),
+                    html.Div([
+                            html.H5("Import", style = {"color": colors["white"], "height": "38"}),
+                            dcc.Dropdown(
+                                id = "import_dropdown",
+                                options = [],
+                                multi = True,
+                                placeholder = "Select an import",
+                            )],
+                        className = "five columns"
+                        ),
+                    html.Div([html.H5("Evaluation Date", style = {"color": colors["white"]}),
+                            dcc.DatePickerRange(
+                                id = "eval_date",
+                                start_date = date.today() - timedelta(1) - timedelta(weeks = 2),
+                                end_date = date.today() - timedelta(1)
+                            )
+                            ],
+                        className = "three columns"
+                        ),
+                    html.Div([
+                        html.Button("Fetch", id = "fetch_button",
+                        style = {
+                            "color": colors["blue"],
+                            "backgroundColor": colors["white"],
+                            "height": "38",
+                            "width": "285%",
+                            "marginTop": "45",
+                            "marginLeft": "0",
+                            "fontSize": "16"
+                            })],
                         className = "one columns"
                         )
-                    ],
-                    className = "row"
-                    ),
-                html.Div(style = {"color": colors["blue"]},
-                className = "row",
-                children = [
-                html.Div([
-                    html.H5("Language", style = {"color": colors["white"], "height": "38"}),
-                    dcc.Dropdown(
-                        id = "language_dropdown",
-                        options = [{"label": l, "value": l} for l in LANGUAGES],
-                        placeholder = "Select a language"
-                    )],
-                    className = "two columns"
-                    ),
-                html.Div([
-                        html.H5("Import", style = {"color": colors["white"], "height": "38"}),
-                        dcc.Dropdown(
-                            id = "import_dropdown",
-                            options = [],
-                            multi = True,
-                            placeholder = "Select an import",
-                        )],
-                    className = "five columns"
-                    ),
-                html.Div([html.H5("Evaluation Date", style = {"color": colors["white"]}),
-                        dcc.DatePickerRange(
-                            id = "eval_date",
-                            start_date = date.today() - timedelta(1) - timedelta(weeks = 2),
-                            end_date = date.today() - timedelta(1)
-                        )
-                        ],
-                    className = "three columns"
-                    ),
-                html.Div([
-                    html.Button("Fetch", id = "fetch_button",
-                    style = {
-                        "color": colors["blue"],
-                        "backgroundColor": colors["white"],
-                        "height": "38",
-                        "width": "285%",
-                        "marginTop": "45",
-                        "marginLeft": "0",
-                        "fontSize": "16"
-                        })],
-                    className = "one columns"
-                    )
-                ]),
-                html.Div([
+                    ]),
                     html.Div([
-                        dcc.Graph(
-                            style={"height": 300},
-                            id = "imports_by_date_graph"
+                        html.Div([
+                            dcc.Graph(
+                                style={"height": 300},
+                                id = "imports_by_date_graph"
+                                )],
+                            className = "twelve columns",
+                            style={"margin-top": "10"}
                             )],
-                        className = "twelve columns",
-                        style={"margin-top": "10"}
-                        )],
-                className = "row",
-                ),
-                html.Div([
-                    html.Div([dcc.Graph(id = "import_summary_bar", style = {"height": 400})],
-                        className = "six columns",
-                        style={"margin-top": "20"}
-                        ),
-                    html.Div([dcc.Graph(id = "language_share_pie", style = {"height": 400})],
-                        className = "six columns",
-                        style={"margin-top": "20"}
-                        )
-                    ],
-                    className = "row"
-                ),
-        ])
-])
+                    className = "row",
+                    ),
+                    html.Div([
+                        html.Div([dcc.Graph(id = "import_summary_bar", style = {"height": 400})],
+                            className = "six columns",
+                            style={"margin-top": "20"}
+                            ),
+                        html.Div([dcc.Graph(id = "language_share_pie", style = {"height": 400})],
+                            className = "six columns",
+                            style={"margin-top": "20"}
+                            )
+                        ],
+                        className = "row"
+                    ),
+            ])
+    ])
+app.layout = serve_layout()
 app.css.append_css({
     "external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"
 })
@@ -195,7 +197,7 @@ def refresh_imports_by_date_graph(clicks, language, packages, start_date, end_da
 
     package_data = dal.get_usage_by_import(language, packages, start_date, end_date)
     colors = gen_colors(len(packages))
-    
+
     def make_trace(df, package, rgb):
         x_date = df["commit_date"]
         y_package = df[package]
